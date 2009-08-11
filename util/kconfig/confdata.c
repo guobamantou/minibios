@@ -352,7 +352,7 @@ int conf_write(const char *name)
 		if (!out_h)
 			return 1;
 	}
-	sym = sym_lookup("KERNELVERSION", 0);
+	sym = sym_lookup("MINIBIOSVERSION", 0);
 	sym_calc_value(sym);
 	time(&now);
 	env = getenv("KCONFIG_NOTIMESTAMP");
@@ -361,7 +361,7 @@ int conf_write(const char *name)
 
 	fprintf(out, _("#\n"
 		       "# Automatically generated make config: don't edit\n"
-		       "# coreboot version: %s\n"
+		       "# minibios version: %s\n"
 		       "%s%s"
 		       "#\n"),
 		     sym_get_string_value(sym),
@@ -370,7 +370,7 @@ int conf_write(const char *name)
 	if (out_h)
 		fprintf(out_h, "/*\n"
 			       " * Automatically generated C config: don't edit\n"
-			       " * coreboot version: %s\n"
+			       " * minibios version: %s\n"
 			       "%s%s"
 			       " */\n"
 			       "#define AUTOCONF_INCLUDED\n",

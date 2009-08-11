@@ -1087,7 +1087,7 @@ int main(int ac, char **av)
 			return 1;
 		}
 		printf(_("\n\n"
-			"*** End of coreboot configuration.\n"
+			"*** End of minibios configuration.\n"
 			"*** Execute 'make' to build the firmware or try 'make help'."
 			"\n\n"));
 	} else {

@@ -13,6 +13,7 @@ CPP	= $(CC) -E
 LD	= $(CROSS_COMPILE)ld
 LN	= $(CROSS_COMPILE)ln
 OBJCOPY = $(CROSS_COMPILE)objcopy
+CFLAGS = -Os -Wall -Wundef -Wstrict-prototype 
 
 HOSTCC		= cc
 HOSTCXX		= g++
@@ -23,15 +24,17 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
+MINIBIOSINCLUDE = -I $(src)/include
+
 export src obj
 export MINIBIOSVERSION
 include util/Makefile
 
 
 rom:
-	echo $(MINIBIOSVERSION)
 	@echo "not imp now"
 ram:
+	@echo "not imp now"
 
 prepare:
 	@rm -rf $(obj)
@@ -39,3 +42,4 @@ prepare:
 
 clean:
 	rm -rf $(obj)
+	rm -rf $(src)/include/autoconf.h
