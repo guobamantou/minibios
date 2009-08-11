@@ -1,0 +1,26 @@
+
+mainmenu "minibios configuration"
+
+menu "CPU selection"
+choice 
+	prompt "CPU type"
+	default Loongson2F
+config Loongson2F 
+	bool "Loongson 2F"
+config Loongson2G
+	bool "Loongson 2G"
+endchoice
+endmenu
+
+menu "Board selection"
+config Loongson2F-FULOONG
+	bool "Loongson2F fuloong"
+	depends on Loongson2F
+config Loongson2F-YELOONG
+	bool "Loongson2F yeloong"
+	depends on Loongson2F
+config Loongson2G-DEVBOARD
+	bool "Loongson2G dev board"
+	depends on Loongson2G
+endmenu
+

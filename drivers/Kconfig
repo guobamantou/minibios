@@ -1,0 +1,14 @@
+menu  "UART select"
+chioce	
+	prompt "UART select"
+config Loongson2F-UART1
+	bool "Loongson2F UART 1"
+	depends on Loongson2F
+config Loongson2F-UART2
+	bool "Loongson2F UART 2"
+	depends on Loongson2F
+config Loongson2G-UART1
+	bool "Loongson2G UART 1"
+	depends on Loongson2G
+endchoice
+endmenu

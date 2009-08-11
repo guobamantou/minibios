@@ -1,0 +1,17 @@
+#
+# Automatically generated make config: don't edit
+# coreboot version: KERNELVERSION
+# Tue Aug 11 21:02:18 2009
+#
+
+#
+# CPU selection
+#
+CONFIG_Loongson2F=y
+# CONFIG_Loongson2G is not set
+
+#
+# Board selection
+#
+# CONFIG_Loongson2F-FULOONG is not set
+CONFIG_Loongson2F-YELOONG=y
