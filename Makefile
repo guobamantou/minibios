@@ -29,12 +29,15 @@ MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
 MINIBIOSINCLUDE = -I $(src)/include
 
+# Files to ingore in find statement
+FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
+
 export src obj
 export MINIBIOSVERSION
 include util/Makefile
 
 
-rom:
+rom: $(src)/
 	@echo "not imp now"
 ram:
 	@echo "not imp now"
@@ -43,6 +46,9 @@ prepare:
 	@rm -rf $(obj)
 	@mkdir -p $(obj)
 
-clean:
+clean: 
 	rm -rf $(obj)
 	rm -rf $(src)/include/autoconf.h
+	@find . $(FIND_IGNORE) \
+			\( -name '*.o' -o -name '*.tmp' \) \
+			-type f -print |xargs rm -f
