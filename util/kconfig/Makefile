@@ -16,12 +16,12 @@ $(obj)/util/kconfig/mconf: $(patsubst %,$(obj)/util/kconfig/%,$(mconf-objects))
 $(obj)/util/kconfig/mconf.o: $(src)/util/kconfig/mconf.c
 	@mkdir -p $(dir $@)
 	@printf "  HOSTCC  $(subst $(shell pwd)/,,$(@))\n"
-	@$(HOSTCC) $(CFLAGS) $(INTLCFLAGS) -I$(src)/util/kconfig -c -o $@ $<
+	@$(HOSTCC) $(HOSTCFLAGS) $(INTLCFLAGS) -I$(src)/util/kconfig -c -o $@ $<
 
 $(obj)/util/kconfig/zconf.tab.o: $(obj)/util/kconfig/zconf.tab.c $(obj)/util/kconfig/zconf.hash.c $(obj)/util/kconfig/lex.zconf.c
 	@mkdir -p $(dir $@)
 	@printf "  HOSTCC  $(subst $(shell pwd)/,,$(@))\n"
-	@$(HOSTCC) $(CFLAGS) $(INTLCFLAGS) -I$(src)/util/kconfig  -c -o $@ $(obj)/util/kconfig/zconf.tab.c
+	@$(HOSTCC) $(HOSTCFLAGS) $(INTLCFLAGS) -I$(src)/util/kconfig  -c -o $@ $(obj)/util/kconfig/zconf.tab.c
 
 $(obj)/util/kconfig/lex.zconf.c: $(src)/util/kconfig/lex.zconf.c
 	@mkdir -p $(dir $@)

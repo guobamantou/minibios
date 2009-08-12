@@ -13,7 +13,10 @@ CPP	= $(CC) -E
 LD	= $(CROSS_COMPILE)ld
 LN	= $(CROSS_COMPILE)ln
 OBJCOPY = $(CROSS_COMPILE)objcopy
-CFLAGS = -Os -Wall -Wundef -Wstrict-prototype 
+CFLAGS = -Os -Wall -Wstrict-prototypes -Wno-trigraphs \
+		-Werror-implicit-function-declaration -Wstrict-aliasing \
+		-fno-common -ffreestanding -fno-builtin \
+		-mpreferred-stack-boundary=2 -pipe
 
 HOSTCC		= cc
 HOSTCXX		= g++

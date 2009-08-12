@@ -44,7 +44,6 @@ void sym_add_default(struct symbol *sym, const char *def)
 void sym_init(void)
 {
 	struct symbol *sym;
-	struct utsname uts;
 	char *p;
 	static bool inited = false;
 
