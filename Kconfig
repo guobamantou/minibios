@@ -13,17 +13,17 @@ endchoice
 endmenu
 
 menu "Board selection"
-config Loongson2F-FULOONG
+config Loongson2F_FULOONG
 	bool "Loongson2F fuloong"
 	depends on Loongson2F
 	help
 		include fuloong 600x and 601x series
-config Loongson2F-YELOONG
-	bool "Loongson2F yeloong"
+config Loongson2F_YEELOONG
+	bool "Loongson2F yeeloong"
 	depends on Loongson2F
 	help
 		include yeloong 8089 and 8010 
-config Loongson2G-DEVBOARD
+config Loongson2G_DEVBOARD
 	bool "Loongson2G dev board"
 	depends on Loongson2G
 endmenu

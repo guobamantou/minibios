@@ -4,7 +4,6 @@ SUBLEVEL = 1
 
 ARCH = mips
 CROSS_COMPILE = mipsel-linux-
-#CROSS_COMPILE = 
 
 AR	= $(CROSS_COMPILE)ar
 AS	= $(CROSS_COMPILE)as
@@ -27,24 +26,32 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
-MINIBIOSINCLUDE = -I $(src)/include
+MINIBIOSINCLUDE = $(src)/include
 
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 
+head-y = $(src)/init/start
+
+minibios-head = $(head-y)
+minibios-main = $(core-y) $(libs-y) $(drivers-y)
+minibios-lds  = $(src)/board/loongson2f-yeeloong-8089/ld.script
+
 export src obj
 export MINIBIOSVERSION
+all:	minibios
 include util/Makefile
+include init/Makefile
 
 
-rom: $(src)/
-	@echo "not imp now"
-ram:
-	@echo "not imp now"
+PHONY += all
+minibios: $(minibios-lds) $(minibios-head) $(minibios-main)
 
+PHONY += prepare
 prepare:
 	@rm -rf $(obj)
 	@mkdir -p $(obj)
+PHONY += clean
 
 clean: 
 	rm -rf $(obj)
@@ -52,3 +59,14 @@ clean:
 	@find . $(FIND_IGNORE) \
 			\( -name '*.o' -o -name '*.tmp' \) \
 			-type f -print |xargs rm -f
+	rm -rf $(src)/init/start.o
+	rm -rf $(src)/init/start
+	rm -rf $(src)/minibios
+	rm -rf $(src)/minibios.rom
+PHONY += help 
+help:
+	@echo  "make menuconfig"
+	@echo  "make rom"
+	@echo  "           get minibios.bin as result"
+.PHONY : $(PHONY)
+
