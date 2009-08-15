@@ -55,11 +55,12 @@ PHONY += clean
 
 clean: 
 	rm -rf $(obj)
-	rm -rf $(src)/include/autoconf.h
+#	rm -rf $(src)/include/autoconf.h
 	@find . $(FIND_IGNORE) \
 			\( -name '*.o' -o -name '*.tmp' \) \
 			-type f -print |xargs rm -f
 	rm -rf $(src)/init/start.o
+	rm -rf $(src)/init/start.s
 	rm -rf $(src)/init/start
 	rm -rf $(src)/minibios
 	rm -rf $(src)/minibios.rom
