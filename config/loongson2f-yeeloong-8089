@@ -1,0 +1,17 @@
+#
+# Automatically generated make config: don't edit
+# minibios version: 0.0.1
+# Sat Aug 15 10:27:16 2009
+#
+
+#
+# CPU selection
+#
+CONFIG_LOONGSON2F=y
+# CONFIG_LOONGSON2G is not set
+
+#
+# Board selection
+#
+# CONFIG_LOONGSON2F_FULOONG is not set
+CONFIG_LOONGSON2F_YEELOONG=y
