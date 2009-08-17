@@ -22,13 +22,13 @@ string: ;\
 	.set	noreorder
 	.set 	mips3
 	.globl	_start	
-//stack = 0x90000000-0x100000
+stack = 0x90000000-0x100000
 _start:
 	mtc0	zero, CP0_STATUS 
 	mtc0	zero, CP0_CAUSE 
 	li		t0, STATUS_BEV
 	mtc0	t0, CP0_STATUS
-//	dli		sp, stack
+	dli		sp, stack
 	
 	bal		init_uart
 	nop
