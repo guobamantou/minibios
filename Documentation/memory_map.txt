@@ -1,0 +1,8 @@
+total memory is 256MB use in minibios
+
+0MB--2MB		use for compress image
+2MB--16MB		use for minibios image(no compress) / uncompress minibios location
+16MB--224MB		used as heap
+224MB--240MB	used as stack
+240MB--256MB	reserved in minibios.save info here to kernel 
+	
