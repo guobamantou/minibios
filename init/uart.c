@@ -27,24 +27,32 @@ void init_uart()
 	uart_out(UART_IER, 0);
 }
 
-int putc(u8 c)
+void putc_hex(u32 val)
 {
+	int i;
+	unsigned char buf[9];
 
-	int ret = 1;
+	for(i = 7; i >= 0; i--) {
+		buf[i] = "0123456789ABCDEF"[val & 0x0F];
+		val >>= 4;
+	}
+	buf[8] = '\0';
+	puts(buf);
+}
+
+void putc(u8 c)
+{
 	int i, timeout = 1000;
 
 	while(timeout-- > 0) {
 		if (uart_in(UART_LSR) & UART_LSR_THRE) {
 			uart_out(UART_TX, c);
-			ret = 0;
 			break;
 		}
 	}
-
-	return ret;
 }
 
-int puts(const char * str)
+void puts(const char * str)
 {
 	char c;
 

@@ -34,10 +34,18 @@ _start:
 	nop
 
 	li 	s0, 20	
-1:	PRINTSTR("Hello, World!\n")
+1:	PRINTSTR("\nHello, World!      ")
+	nop
+	dli a0, 0x12345678
+	bal putc_hex
+	nop
+	dli a0, 0xFEDCBA98
+	bal putc_hex
+	nop
 	addi s0, s0, -1
 	bne s0, zero,1b
 	nop
+
 2:
 	j 2b
 	nop
