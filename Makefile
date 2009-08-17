@@ -3,7 +3,7 @@ PATCHLEVEL = 0
 SUBLEVEL = 1
 
 ARCH = mips
-CROSS_COMPILE = mipsel-linux-
+CROSS_COMPILE = mipsel-linux-gnu-
 
 AR	= $(CROSS_COMPILE)ar
 AS	= $(CROSS_COMPILE)as
@@ -39,7 +39,7 @@ minibios-lds  = $(src)/board/loongson2f-yeeloong-8089/ld.script
 
 export src obj
 export MINIBIOSVERSION
-all:	minibios
+all:	minibios Makefile
 include util/Makefile
 include init/Makefile
 

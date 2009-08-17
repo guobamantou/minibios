@@ -20,9 +20,11 @@ _start:
 	li		t0, STATUS_BEV
 	mtc0	t0, CP0_STATUS
 
+	
 	bal		init_uart
 	nop
 
+	
 	li	t0, 'a'
 	dli	t1, UART_ADDR | 0xffffffffa0000000
 1:	sb	t0, 0(t1)
@@ -36,6 +38,7 @@ _start:
 
 #include <uart.h>
 #define CONS_BAUD B115200
+
 /******* no input and output parameters ********/
 init_uart:
 	dli	t0, UART_ADDR | 0xffffffffa0000000
@@ -65,7 +68,7 @@ init_uart:
 	
 /******* disable all intrrupt ******/
 	sb	zero, UART_IER(t0)
-	j 	ra
+	jr 	ra
 	nop
 end_of_init_uart:
 
