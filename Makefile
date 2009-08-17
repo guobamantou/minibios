@@ -60,6 +60,7 @@ clean:
 			\( -name '*.o' -o -name '*.tmp' \) \
 			-type f -print |xargs rm -f
 	rm -rf $(src)/init/start.o
+	rm -rf $(src)/init/hello.o
 	rm -rf $(src)/init/start.s
 	rm -rf $(src)/init/start
 	rm -rf $(src)/minibios
