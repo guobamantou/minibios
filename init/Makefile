@@ -1,9 +1,7 @@
-$(src)/init/start:	$(src)/init/start.o $(src)/init/uart.o
-	$(LD) $^ -o $(src)/init/start -T $(minibios-lds)
+$(src)/init/start:	$(src)/init/start.o 
+	$(LD) $^ -o $(src)/init/start -e _start -T $(minibios-lds)
 	@cp $(src)/init/start $(src)/minibios
 	$(OBJCOPY) -O binary $(src)/minibios $(src)/minibios.rom 
 $(src)/init/start.o:$(src)/init/start.S $(src)/init/Makefile
-	$(CC) -E $<  -I $(MINIBIOSINCLUDE) -o $(src)/init/start.s
+	$(CC) -E $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $(src)/init/start.s
 	$(AS) -o $(src)/init/start.o $(src)/init/start.s
-$(src)/init/uart.o:$(src)/init/uart.c $(src)/init/Makefile
-	$(CC) -c $< -I $(MINIBIOSINCLUDE) -o $@

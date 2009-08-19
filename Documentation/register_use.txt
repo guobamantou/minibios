@@ -1,0 +1,7 @@
+in all assamble file, register should be use under following rules:
+
+1. use <a0, a1, a2, a3> as input parameters
+2. use <v0, v1> as return paramenters
+3. in sub-procedure, dont use sx register unless store them first
+4. in sub-procedure, t5-t9 should keep their value when return from calling
+
