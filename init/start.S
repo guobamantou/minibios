@@ -9,16 +9,19 @@
 #ifdef CONFIG_LOONGSON2F 
 #include <loongson/loongson2f/uart.h>
 #endif
-/*
-#define PRINTSTR(str) \
+
+#define OFFSET t9  /* t9 should not be used for other purpose */
+
+
+#define PRINTF(str) \
 	.rdata ;\
 2009: ;\
 	.asciz str ;\
 	.text ;\
 	la	a0, 2009b ;\
-	bal	puts ;\
+	bal	uart_puts ;\
 	nop
-*/
+
 
 
 /************************   start here  ************************/
@@ -34,19 +37,35 @@ _start:
 	mtc0	s0, CP0_STATUS
 //	dli		sp, stack
 	
-	bal		init_uart
+	bal	locate
+	nop
+/*************** I conside *******************/
+locate:
+	la	s0, _start
+	subu	OFFSET, ra, s0
+	and	OFFSET, 0xffff0000    ### now OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
+	
+	bal	init_uart
 	nop
 
-	li 	s0, 10	
+	li 	s0, 30	
 1:
-	li a0, 'A'
-	bal uart_putc
+	move a0, OFFSET
+	bal	uart_put_hex
 	nop
+	PRINTF("ni meng hao ma?")
 
+	li	a0,'\r'
+	bal	uart_putc
+	nop
+	li	a0,'\n'
+	bal	uart_putc
+	nop
+#if 1
 	addi s0, s0, -1
 	bne s0, zero,1b
 	nop
-
+#endif
 2:
 	j 2b
 	nop
@@ -90,6 +109,7 @@ exc_others:
 /**************************************************************************/
 /*******************  procedures used in this file  ***********************/
 /**************************************************************************/
+/********  use t0, t1, t2 ,t3 ra ********/
 
 #include <loongson/loongson2f/uart.h>
 init_uart:
@@ -125,23 +145,23 @@ endof_init_uart:
 
 
 /************************************************************/
-uart_putc:
+/********** use t0-t3, a0 ra **********/
+
+uart_putc: 
 	dli	t0,	PHY_TO_UNCACHED(UART_ADDR)	
 	
-	li	v0, 1
 	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
 retry:
 	addi	t1, t1, -1
-	beq	t1, zero, return
+	beq	t1, zero,11f 
 	nop
 	lbu	t2, UART_LSR(t0)
 	and	t2, UART_LSR_THRE
 	beq	t2, zero, retry
 	nop
 /******  can transmit now  *******/	
-	li	v0, 0
 	sb	a0, UART_TX(t0)
-return:
+11:
 	jr	ra
 	nop
 endof_uart_putc:
@@ -150,15 +170,51 @@ endof_uart_putc:
 /************************************************************/
 /************ input parameter a0, 32bit used ****************/
 /************************************************************/
-#if 0
+/******** use a0-a3, v0-v1, ra, t8 **********************/
 uart_put_hex:
-	move	a2, ra
+### store ra first ,because this procedure will call another procedure
+	move	a3, ra  
 	move	a1, a0
-	
+	la	v0, hexchar
+	addu v0, v0, OFFSET
+	lui v1, 0xf000	
+	li	a2, 8
+
 next_hex:
-	and	a0, 
+	and	a0, a1, v1
+	srl	a0, 28
+	addu t8, a0, v0
+	lb	a0, 0(t8)
+	bal uart_putc
+	nop
+	sll	a1, 4
+	addi a2, -1
+	bnez a2, next_hex
+	nop
+	j a3
+	nop
+endof_uart_put_hex:
+hexchar:
+	.ascii "0123456789ABCDEF"
 
-#endif
 
+/************************************************************/
+/******************** output a string ***********************/
+/************************************************************/
+/************************************************************/
+uart_puts:
+	move	a3, ra
+	addu 	t8, a0, OFFSET
+	lbu	a0, 0(t8)
 
-
+next_char:
+	beqz a0, 11f 
+	nop
+	bal	uart_putc
+	addiu t8, 1
+	b next_char
+	lbu	a0, 0(t8)
+11:
+	j	a3
+	nop
+endof_uart_puts:

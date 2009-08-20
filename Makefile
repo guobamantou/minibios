@@ -52,10 +52,11 @@ prepare:
 	@rm -rf $(obj)
 	@mkdir -p $(obj)
 PHONY += clean
-
+cleanconfig:
+	rm -rf $(src)/include/autoconf.h
+	rm -rf $(src)/.config
 clean: 
 	rm -rf $(obj)
-	rm -rf $(src)/include/autoconf.h
 	@find . $(FIND_IGNORE) \
 			\( -name '*.o' -o -name '*.tmp' \) \
 			-type f -print |xargs rm -f
