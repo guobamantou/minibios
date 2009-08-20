@@ -33,7 +33,7 @@
 _start:
 	mtc0	zero, CP0_STATUS 
 	mtc0	zero, CP0_CAUSE 
-	li		s0, STATUS_BEV
+	dli		s0, STATUS_BEV
 	mtc0	s0, CP0_STATUS
 //	dli		sp, stack
 	
@@ -43,17 +43,21 @@ _start:
 locate:
 	la	s0, _start
 	subu	OFFSET, ra, s0
-	and	OFFSET, 0xffff0000    ### now OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
+	lui	s1, 0xffff
+	and	OFFSET, s1    ### now OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
 	
 	bal	init_uart
 	nop
+	li	a0,'U'
+	bal	uart_putc
+	nop
 
-	li 	s0, 30	
+	li 	s0, 15	
 1:
-	move a0, OFFSET
+	add a0, OFFSET,zero
 	bal	uart_put_hex
 	nop
-	PRINTF("ni meng hao ma?")
+#	PRINTF("rom?")
 
 	li	a0,'\r'
 	bal	uart_putc
@@ -61,13 +65,14 @@ locate:
 	li	a0,'\n'
 	bal	uart_putc
 	nop
-#if 1
+
 	addi s0, s0, -1
 	bne s0, zero,1b
 	nop
-#endif
+
 2:
-	j 2b
+	li a0, 1
+	bnez a0, 2b
 	nop
 
 #if 0
@@ -173,8 +178,8 @@ endof_uart_putc:
 /******** use a0-a3, v0-v1, ra, t8 **********************/
 uart_put_hex:
 ### store ra first ,because this procedure will call another procedure
-	move	a3, ra  
-	move	a1, a0
+	add	a3, ra, zero  
+	add	a1, a0, zero
 	la	v0, hexchar
 	addu v0, v0, OFFSET
 	lui v1, 0xf000	
@@ -203,7 +208,7 @@ hexchar:
 /************************************************************/
 /************************************************************/
 uart_puts:
-	move	a3, ra
+	add	a3, ra, zero
 	addu 	t8, a0, OFFSET
 	lbu	a0, 0(t8)
 
