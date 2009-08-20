@@ -1,6 +1,6 @@
 VERSION = 0
 PATCHLEVEL = 0
-SUBLEVEL = 1
+SUBLEVEL = 2
 
 ARCH = mips
 CROSS_COMPILE = mipsel-linux-gnu-
