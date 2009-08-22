@@ -1,3 +1,7 @@
+	.set	noreorder
+	.set 	mips3
+	.globl	_start	
+
 #include <autoconf.h>
 #include <loongson/regdef.h>
 #include <loongson/addrspace.h>
@@ -5,6 +9,7 @@
 
 #ifdef CONFIG_LOONGSON2F
 #include <loongson/loongson2f/cp0.h>
+#include <loongson/loongson2f/nb_reg.h>
 #endif
 
 #ifdef CONFIG_LOONGSON2F 
@@ -22,13 +27,30 @@
 	bal	uart_puts ;\
 	nop
 
+#define BUS0_CFG_ADDR(dev, fun, reg) (1<<((dev) + 11) | (fun)<<8 | (reg))
 
+#define BUS0_PCICFG_READ(dev, fun, reg) \
+	dli	a0,	BUS0_CFG_ADDR(dev, fun, reg); \
+	srl a1, a0, 16; \
+	andi a0, a0, 0xffff; \
+	dli a2, PHY_TO_UNCACHED(PCIMAP_CFG); \
+	sw	a1, 0(a2); \
+	dli a2, PHY_TO_UNCACHED(PCICFG_SPACE); \
+	or	a2, a2, a0; \
+	lw	v0, 0(a2);
+
+#define BUS0_PCICFG_WRITE(dev, fun, reg, val) \
+	dli	a0,	BUS0_CFG_ADDR(dev, fun, reg); \
+	srl a1, a0, 16; \
+	andi a0, a0, 0xffff; \
+	dli a2, PHY_TO_UNCACHED(PCIMAP_CFG); \
+	sw	a1, 0(a2); \
+	dli a2, PHY_TO_UNCACHED(PCICFG_SPACE); \
+	or	a2, a2, a0; \
+	dli	v0, val; \
+	sw	v0, 0(a2);
 
 /************************   start here  ************************/
-
-	.set	noreorder
-	.set 	mips3
-	.globl	_start	
 //stack = 0x90000000-0x100000
 _start:
 	mtc0	zero, CP0_STATUS 
@@ -39,6 +61,8 @@ _start:
 	
 	bal	locate
 	nop
+
+
 /*************** I conside *******************/
 locate:
 	la	s0, _start
@@ -54,10 +78,20 @@ locate:
 
 	li 	s0, 15	
 1:
-	add a0, OFFSET,zero
-	bal	uart_put_hex
+	BUS0_PCICFG_READ(7, 0, 0x0);
+	add a0, v0
+	bal uart_put_hex
 	nop
-	PRINTF("rom?")
+BUS0_PCICFG_READ(7, 0, 0x14);
+	add a0, v0
+	bal uart_put_hex
+	nop
+BUS0_PCICFG_WRITE(7, 0, 0x14, 0xffffff00);
+BUS0_PCICFG_READ(7, 0, 0x14);
+	add a0, v0
+	bal uart_put_hex
+	nop
+
 
 	li	a0,'\r'
 	bal	uart_putc
