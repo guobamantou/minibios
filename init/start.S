@@ -16,6 +16,11 @@
 #include <loongson/loongson2f/uart.h>
 #endif
 
+#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
+#include <cs5536.h>
+#endif
+#include <idsel.h>
+
 #define OFFSET t9  /* t9 should not be used for other purpose */
 
 #define PRINTF(str) \
@@ -72,41 +77,31 @@ locate:
 	
 	bal	init_uart
 	nop
-	li	a0,'U'
-	bal	uart_putc
-	nop
 
-	li 	s0, 15	
-1:
-	BUS0_PCICFG_READ(7, 0, 0x0);
-	add a0, v0
-	bal uart_put_hex
-	nop
-BUS0_PCICFG_READ(7, 0, 0x14);
-	add a0, v0
-	bal uart_put_hex
-	nop
-BUS0_PCICFG_WRITE(7, 0, 0x14, 0xffffff00);
-BUS0_PCICFG_READ(7, 0, 0x14);
-	add a0, v0
-	bal uart_put_hex
-	nop
+#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 
 
-	li	a0,'\r'
-	bal	uart_putc
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
+	dli	a0, CS5536ID
+	beq a0, v0, 22f
 	nop
-	li	a0,'\n'
-	bal	uart_putc
+11:	
+	PRINTF("find unknow south brigde:0x");
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
+	add a0, v0, zero
+	bal	uart_put_hex
 	nop
+	PRINTF("\r\n")
+	b	11b	
+	nop
+22:
+	PRINTF("find amd cs5536 south brigde\r\n");
 
-	addi s0, s0, -1
-	bne s0, zero,1b
-	nop
+#endif
 
+	
 2:
-	li a0, 1
-	bnez a0, 2b
+	b	2b
 	nop
 
 

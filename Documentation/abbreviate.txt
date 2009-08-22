@@ -1,4 +1,5 @@
 in register and function definition ,below abbreviates are used
 
-config ---  CFG
-register --- REG
+address		--- ADDR
+config		---	CFG
+register	--- REG

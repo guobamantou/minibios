@@ -26,7 +26,7 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
-MINIBIOSINCLUDE = $(src)/include
+MINIBIOSINCLUDE = $(src)/include  -I $(src)/board/loongson2f-yeeloong-8089/include
 
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
