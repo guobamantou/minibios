@@ -36,5 +36,41 @@
 #define CS5536_GPIO_BASE		(CS5536_DIVIL_MSR_BASE | 0x0c)
 #define CS5536_MFGPT_BASE		(CS5536_DIVIL_MSR_BASE | 0x0d)
 
+/*
+ * SMB definition
+ */
+/* SMB_CLK is gpio14 , SMB_DATA is gpio15*/
+#define SMB_CLK		14    
+#define SMB_DATA	15
+
+#define SMB_SDA		0x00
+#define SMB_STS		0x01
+#define SMB_CTRL_STS	0x02
+#define SMB_CTRL1	0x03
+#define SMB_ADDR	0x04
+#define SMB_CTRL2	0x05
+#define SMB_CTRL3	0x06		
+
+/*
+ * GPIO definition
+ */
+
+#define GPIOL_OUT_VAL	0x00
+#define GPIOL_OUT_EN	0x04
+#define GPIOL_OUT_AUX1_SEL	0x10
+#define GPIOL_OUT_AUX2_SEL	0x10
+#define GPIOL_IN_EN		0x20
+#define GPIOL_IN_AUX1_SEL	0x20
+
+
+
+
+
+
+
+
+
+
+
 
 
