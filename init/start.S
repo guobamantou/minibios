@@ -55,6 +55,19 @@
 	dli	v0, val; \
 	sw	v0, 0(a2);
 
+#define CS5536_MSR_WRITE(reg, lo, hi) \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_ADDR, reg); \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_DATA0, lo); \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_DATA1, hi);
+#if 0
+#define CS5536_MSR_READ(reg) \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_ADDR, reg); \
+    BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA0); \
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA1);
+#endif
+
+
+
 /************************   start here  ************************/
 //stack = 0x90000000-0x100000
 _start:
@@ -97,8 +110,50 @@ locate:
 22:
 	PRINTF("find amd cs5536 south brigde\r\n");
 
+	/*enable msr access*/
+	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_CTRL, MSR_EN);
+#if 1	
+	PRINTF("\r\nlow ");
+	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_ADDR, CS5536_PORT_EN); 
+    BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA0); 
+	add a0, v0, zero
+	bal uart_put_hex
+	nop	
+	PRINTF("\r\nhigh ");
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA1);
+	add a0, v0, zero
+	bal uart_put_hex
+	nop	
+#endif
+	/*enable all ports*/
+	CS5536_MSR_WRITE(CS5536_PORT_EN, 0xffff, 0x0)
+#if 1
+	PRINTF("\r\nlow ");
+	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_ADDR, CS5536_PORT_EN); 
+    BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA0); 
+	add a0, v0, zero
+	bal uart_put_hex
+	nop	
+	PRINTF("\r\nhigh ");
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, MSR_DATA1);
+	add a0, v0, zero
+	bal uart_put_hex
+	nop	
 #endif
 
+/*
+ * because we will operate smb bus shortly, 
+ * set base addr manually now, and gpio base addr
+ */
+
+#define DIVIL_BASE_ADDR     0xB000
+#define SMB_BASE_ADDR       (DIVIL_BASE_ADDR | 0x320)
+#define GPIO_BASE_ADDR      (DIVIL_BASE_ADDR | 0x000)
+
+	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0Xf001);
+	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0Xf001);
+
+#endif
 	
 2:
 	b	2b

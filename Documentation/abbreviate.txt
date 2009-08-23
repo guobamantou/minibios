@@ -2,4 +2,6 @@ in register and function definition ,below abbreviates are used
 
 address		--- ADDR
 config		---	CFG
+control		--- CTRL
+enable		--- EN
 register	--- REG

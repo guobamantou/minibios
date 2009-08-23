@@ -71,5 +71,8 @@ help:
 	@echo  "make menuconfig"
 	@echo  "make rom"
 	@echo  "           get minibios.bin as result"
+bak:
+	tar czf /tmp/minibios.tar.gz *
+	cp /tmp/minibios.tar.gz /mnt/sda5/
 .PHONY : $(PHONY)
 
