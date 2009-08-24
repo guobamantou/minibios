@@ -68,12 +68,26 @@
 
 #define IO_INB(reg) \
 	dli v1, 0xffffffffbfd00000; \
-	lbu v0, reg(v1)
+	or	v1, reg; \
+	lbu v0, 0(v1)
 
 /* use a0 a0 input parameter */
 #define IO_OUTB(reg) \
 	dli v0, 0xffffffffbfd00000; \
-	sbu a0, reg(v0)
+	or	v1, reg; \
+	sbu a0, 0(v0)
+
+#define IO_INW(reg) \
+	dli v1, 0xffffffffbfd00000; \
+	or	v1, reg; \
+	lw	v0, 0(v1)
+
+/* use a0 a0 input parameter */
+#define IO_OUTW(reg) \
+	dli v0, 0xffffffffbfd00000; \
+	or	v1, reg; \
+	sw a0, 0(v0)
+
 
 
 
@@ -96,10 +110,20 @@ locate:
 	la	s0, _start
 	subu	OFFSET, ra, s0
 	lui	s1, 0xffff
-	and	OFFSET, s1    ### now OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
+	and	OFFSET, s1    ### OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
 	
 	bal	init_uart
 	nop
+ 
+init_nb:
+	/* init north bridge(virtual?) */
+	PRINTF("INIT North Bridge\r\n");
+#if 0
+	dli	v0, PHY_TO_UNCACHED(NBCFG_HEADER + 8)	
+	lw	a0, 0(v0)
+	bal	uart_put_hex
+	nop
+#endif
 
 #if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 
@@ -118,12 +142,30 @@ locate:
 	nop
 22:
 	PRINTF("find amd cs5536 south brigde\r\n");
-
+	
 	/*enable msr access*/
 	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_CTRL, MSR_EN);
 
 	/*enable all ports*/
-	CS5536_MSR_WRITE(CS5536_PORT_EN, 0x000f, 0x0)
+	CS5536_MSR_WRITE(CS5536_PORT_EN, 0xffff, 0x0)
+#if 1	
+    // GLOBAL CONTROL setting
+    CS5536_MSR_WRITE((CS5536_SB_MSR_BASE | 0x10), 0x00000003, 0x44000030);
+#endif
+#if 0
+	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, 0xf4, CS5536_SB_MSR_BASE | 0x10);
+	PRINTF("\r\n yu:")
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XF8);	
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+
+	PRINTF("\r\n yu:")
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XFc);	
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+#endif
 
 /*
  * because we will operate smb bus shortly, 
@@ -133,21 +175,6 @@ locate:
 #define DIVIL_BASE_ADDR     0xB000
 #define SMB_BASE_ADDR       (DIVIL_BASE_ADDR | 0x320)
 #define GPIO_BASE_ADDR      (DIVIL_BASE_ADDR | 0x000)
-
-nop
-	nop
-	nop
-	nop
-	dli a0, 0xfffffffff2345678
-	nop
-	dli a0, 0xf2345678
-	nop
-	li a0, 0xf2345678
-		nop
-	nop
-	nop
-	nop
-	nop
 
 /*
  * set two bits relative simultaneous is effect gpio bit set
@@ -174,12 +201,12 @@ nop
 	and a0, a1; \
 	sw	a0, 0(v0);
 
-
-	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0Xf001);
-	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0Xf001);
+init_smb:
+	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0xf001);
+	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
 	
 	/* config gpio14 to be smb_clk and gpio15 to be smb_data */
-    GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_IN_EN);
+	GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_IN_EN);
     GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_OUT_EN);
     GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
     GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
@@ -188,6 +215,26 @@ nop
     GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_OUT_EN);
     GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
     GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
+
+	/* init smbus */
+	PRINTF("\r\nSDA:");
+	IO_INB(SMB_BASE_ADDR | SMB_SDA);
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+
+	PRINTF("\r\n1:")
+	IO_INB(SMB_BASE_ADDR | 1);
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+
+	PRINTF("\r\n2:")
+	IO_INB(SMB_BASE_ADDR | 2);
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+
 
 #endif	
 2:

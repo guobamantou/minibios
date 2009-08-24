@@ -2,7 +2,7 @@
  * cs5536 config header space is not standard
  */
 #define CS5536ID	0x208f1022
-#define MSR_CTRL 0xF0
+#define MSR_CTRL	0xF0
 #define MSR_ADDR	0xF4
 #define MSR_DATA0	0xF8
 #define MSR_DATA1	0xFC
@@ -55,12 +55,12 @@
  * GPIO definition
  */
 
-#define GPIOL_OUT_VAL	0x00
-#define GPIOL_OUT_EN	0x04
+#define GPIOL_OUT_VAL		0x00
+#define GPIOL_OUT_EN		0x04
 #define GPIOL_OUT_AUX1_SEL	0x10
-#define GPIOL_OUT_AUX2_SEL	0x10
-#define GPIOL_IN_EN		0x20
-#define GPIOL_IN_AUX1_SEL	0x20
+#define GPIOL_OUT_AUX2_SEL	0x14
+#define GPIOL_IN_EN			0x20
+#define GPIOL_IN_AUX1_SEL	0x34
 
 
 
