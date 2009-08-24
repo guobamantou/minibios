@@ -51,6 +51,17 @@
 #define SMB_CTRL2	0x05
 #define SMB_CTRL3	0x06		
 
+/* SMB_CTRL1 */
+#define SMB_STOP	(1 << 1)
+
+/* SMB_CTRL2 AND SMB_CTRL3 */
+#define SMB_FREQ	0x3c
+#define SMB_DISABLE	0x00
+#define SMB_ENABLE	0x01
+
+/* SMB_CTRL_STS */
+#define SMB_BUS_BUSY	(1 << 1)
+
 /*
  * GPIO definition
  */

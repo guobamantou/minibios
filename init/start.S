@@ -68,24 +68,24 @@
 
 #define IO_INB(reg) \
 	dli v1, 0xffffffffbfd00000; \
-	or	v1, reg; \
+	ori	v1, reg; \
 	lbu v0, 0(v1)
 
-/* use a0 a0 input parameter */
+/* use a0 input parameter */
 #define IO_OUTB(reg) \
-	dli v0, 0xffffffffbfd00000; \
-	or	v1, reg; \
-	sbu a0, 0(v0)
+	dli	v0, 0xffffffffbfd00000; \
+	ori	v1, reg; \
+	sb	a0, 0(v0)
 
 #define IO_INW(reg) \
 	dli v1, 0xffffffffbfd00000; \
-	or	v1, reg; \
-	lw	v0, 0(v1)
+	ori	v1, reg; \
+	lwu	v0, 0(v1)
 
-/* use a0 a0 input parameter */
+/* use a0 input parameter */
 #define IO_OUTW(reg) \
 	dli v0, 0xffffffffbfd00000; \
-	or	v1, reg; \
+	ori	v1, reg; \
 	sw a0, 0(v0)
 
 
@@ -148,25 +148,6 @@ init_nb:
 
 	/*enable all ports*/
 	CS5536_MSR_WRITE(CS5536_PORT_EN, 0xffff, 0x0)
-#if 1	
-    // GLOBAL CONTROL setting
-    CS5536_MSR_WRITE((CS5536_SB_MSR_BASE | 0x10), 0x00000003, 0x44000030);
-#endif
-#if 0
-	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, 0xf4, CS5536_SB_MSR_BASE | 0x10);
-	PRINTF("\r\n yu:")
-	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XF8);	
-	add a0, v0, zero
-	bal	uart_put_hex
-	nop
-
-	PRINTF("\r\n yu:")
-	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XFc);	
-	add a0, v0, zero
-	bal	uart_put_hex
-	nop
-#endif
-
 /*
  * because we will operate smb bus shortly, 
  * set base addr manually now, and gpio base addr
@@ -217,24 +198,39 @@ init_smb:
     GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	PRINTF("\r\nSDA:");
-	IO_INB(SMB_BASE_ADDR | SMB_SDA);
-	add a0, v0, zero
-	bal	uart_put_hex
-	nop
+	
+	/* disable smb and set freq */
+	li	a0, (((SMB_FREQ && 0x7f) << 1) | SMB_DISABLE) 
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
+	li	a0, (SMB_FREQ &0x7f80)
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL3);
 
-	PRINTF("\r\n1:")
-	IO_INB(SMB_BASE_ADDR | 1);
-	add a0, v0, zero
-	bal	uart_put_hex
-	nop
+	li	a0, 0x00
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+	
+	/* disable slave mode */
+	li	a0, 0x00
+	IO_OUTB(SMB_BASE_ADDR | SMB_ADDR);
 
-	PRINTF("\r\n2:")
-	IO_INB(SMB_BASE_ADDR | 2);
-	add a0, v0, zero
-	bal	uart_put_hex
-	nop
+	/* enable smb now */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL2);
+	ori	v0, v0, SMB_ENABLE
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
 
+	/* send a stop, idle the bus */	
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
+	ori	a0, v0, SMB_STOP
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+
+	/* clear all error status */
+	li	a0, 0xff
+	IO_OUTB(SMB_BASE_ADDR | SMB_STS);
+
+	/* clear bus busy bit */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL_STS);
+	ori	a0, v0, SMB_BUS_BUSY
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL_STS);
+		
 
 #endif	
 2:
@@ -247,3 +243,21 @@ init_smb:
 /**************************************************************************/
 
 #include "uart.S"
+
+
+#if 0
+	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, 0xf4, CS5536_SB_MSR_BASE | 0x10);
+	PRINTF("\r\n yu:")
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XF8);	
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+
+	PRINTF("\r\n yu:")
+	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0XFc);	
+	add a0, v0, zero
+	bal	uart_put_hex
+	nop
+#endif
+
+
