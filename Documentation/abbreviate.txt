@@ -4,4 +4,5 @@ address		--- ADDR
 config		---	CFG
 control		--- CTRL
 enable		--- EN
+error		--- ERR
 register	--- REG

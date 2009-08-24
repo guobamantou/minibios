@@ -40,8 +40,8 @@
  * SMB definition
  */
 /* SMB_CLK is gpio14 , SMB_DATA is gpio15*/
-#define SMB_CLK		14    
-#define SMB_DATA	15
+#define SMB_CLK_PIN		14    
+#define SMB_DATA_PIN	15
 
 #define SMB_SDA		0x00
 #define SMB_STS		0x01
@@ -53,11 +53,19 @@
 
 /* SMB_CTRL1 */
 #define SMB_STOP	(1 << 1)
+#define SMB_START	(1 << 0)
 
 /* SMB_CTRL2 AND SMB_CTRL3 */
 #define SMB_FREQ	0x3c
 #define SMB_DISABLE	0x00
 #define SMB_ENABLE	0x01
+
+/* SMB_STS */
+#define SMB_SLVSTP	(1 << 7)
+#define SMB_SDAST	(1 << 6)
+#define SMB_BER		(1 << 5)
+#define SMB_NEGACK	(1 << 4)
+#define SMB_STASTR	(1 << 3)
 
 /* SMB_CTRL_STS */
 #define SMB_BUS_BUSY	(1 << 1)

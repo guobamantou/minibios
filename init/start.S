@@ -71,10 +71,10 @@
 	ori	v1, reg; \
 	lbu v0, 0(v1)
 
-/* use a0 input parameter */
+/* use a0 as input parameter */
 #define IO_OUTB(reg) \
 	dli	v0, 0xffffffffbfd00000; \
-	ori	v1, reg; \
+	ori	v0, reg; \
 	sb	a0, 0(v0)
 
 #define IO_INW(reg) \
@@ -82,10 +82,10 @@
 	ori	v1, reg; \
 	lwu	v0, 0(v1)
 
-/* use a0 input parameter */
+/* use a0 as input parameter */
 #define IO_OUTW(reg) \
 	dli v0, 0xffffffffbfd00000; \
-	ori	v1, reg; \
+	ori	v0, reg; \
 	sw a0, 0(v0)
 
 
@@ -187,22 +187,22 @@ init_smb:
 	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
 	
 	/* config gpio14 to be smb_clk and gpio15 to be smb_data */
-	GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_IN_EN);
-    GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_OUT_EN);
-    GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
-    GPIO_HI_BIT(SMB_CLK, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
+	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
+    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
+    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
+    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
-    GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_IN_EN);
-    GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_OUT_EN);
-    GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
-    GPIO_HI_BIT(SMB_DATA, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
+    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
+    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
+    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
+    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	
+
 	/* disable smb and set freq */
-	li	a0, (((SMB_FREQ && 0x7f) << 1) | SMB_DISABLE) 
+	li	a0, (((SMB_FREQ & 0x7f) << 1) | SMB_DISABLE) 
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
-	li	a0, (SMB_FREQ &0x7f80)
+	li	a0, ((SMB_FREQ & 0x7f80) >> 7)
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL3);
 
 	li	a0, 0x00
@@ -214,7 +214,7 @@ init_smb:
 
 	/* enable smb now */
 	IO_INB(SMB_BASE_ADDR | SMB_CTRL2);
-	ori	v0, v0, SMB_ENABLE
+	ori	a0, v0, SMB_ENABLE
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
 
 	/* send a stop, idle the bus */	
@@ -231,6 +231,49 @@ init_smb:
 	ori	a0, v0, SMB_BUS_BUSY
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL_STS);
 		
+#if 1
+	IO_INB(SMB_BASE_ADDR | 0);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 1);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 2);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 3);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 4);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 5);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	IO_INB(SMB_BASE_ADDR | 6);
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+
+
+	/* check spd i2c value now*/
+//	bal smb_read
+	nop
+
+#endif
 
 #endif	
 2:
@@ -241,6 +284,67 @@ init_smb:
 /**************************************************************************/
 /*******************  procedures used in this file  ***********************/
 /**************************************************************************/
+
+/*
+ * a0: slave addr
+ * a1: index
+ * v0: return val
+ * follow "random read" sequence description in cs5536 manual
+ * use a0, a1, a2, a3, v0, v1, t5, t6, t7
+ */
+smb_read:
+	andi	a0, a0, 0xfe
+	add	t5, a0, zero
+	add	t6, a1, zero
+	add	t7, ra, zero		
+
+	/* start */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
+	ori	a0, v0, SMB_START
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+
+
+endof_smb_read:
+/**/
+smb_write:
+
+
+endof_smb_write:
+
+/* smb wait and error check */
+/* use t1, t2, t3, t4, v0 */
+smb_wait:
+	add	t4, ra, zero	# save ra first
+	li	t1, 1000		# this value is big enough
+1:		
+	li	t2, 1000
+2:
+	addiu	t2, t2, -1
+	bnez	t2, 2b		# dont use delay slot here
+	nop
+	lui		t3, 0xbfd0
+	ori		t3, (SMB_BASE_ADDR | SMB_STS)
+	lbu		v0, 0(t3)
+	andi	v0, (SMB_BER | SMB_NEGACK)
+	bnez	v0, 4f
+	nop
+	lbu		v0, 0(t3)
+	andi	v0, SMB_SDAST	# have transmit done or can receive now
+	bnez	v0, 3f
+	nop
+	addiu	t1, t1, -1
+	bnez	t1, 1b
+	nop
+3:
+	j	t4
+	li	v0, 0
+	
+4:
+	j	t4
+	li	v0, 1
+
+	
+endof_smb_wait:
 
 #include "uart.S"
 

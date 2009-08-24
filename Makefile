@@ -46,6 +46,8 @@ include init/Makefile
 
 PHONY += all
 minibios: $(minibios-lds) $(minibios-head) $(minibios-main)
+	cp minibios.rom /tftpboot
+	cp minibios /tftpboot
 
 PHONY += prepare
 prepare:

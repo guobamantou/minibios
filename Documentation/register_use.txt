@@ -4,5 +4,6 @@ in all assamble file, register should be use under following rules:
 2. use <v0, v1> as return paramenters
 3. in sub-procedure, dont use sx register unless store them first
 4. in sub-procedure, t5-t9 should keep their value when return from calling
-5. t9 is for offset record, should not be change at any conditions
+5. use t1-t4 in leaf procedure, dont use t5-t9
+6. t9 is for offset record, should not be change at any conditions
 
