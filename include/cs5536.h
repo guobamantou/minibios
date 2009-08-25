@@ -84,3 +84,34 @@
 #define GPIOL_IN_EN			0x20
 #define GPIOL_IN_AUX1_SEL	0x34
 
+/*
+ * set two bits relative simultaneous is effect gpio bit set
+ * see detail in section "atomic bit programming model" in cs5536 manual 
+ */
+#define GPIO_HI_BIT(bit, reg)\
+	dli	v0, 0xffffffffbfd00000; \
+	ori	v0, reg; \
+	lw	a0, 0(v0); \
+	li	a1, (1 << bit); \
+	or	a0, a1; \
+	sll a1, 16; \
+	not a1; \
+	and a0, a1; \
+	sw	a0, 0(v0);
+
+#define GPIO_LO_BIT(bit, reg)\
+	dli	v0, 0xffffffffbfd00000; \
+	ori	v0, reg; \
+	lw	a0, 0(v0); \
+	sll	a1, (1 << (bit + 16)); \
+	or	a0, a1; \
+	li	a1, ~(1 << bit); \
+	and a0, a1; \
+	sw	a0, 0(v0);
+
+#define CS5536_MSR_WRITE(reg, lo, hi) \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_ADDR, reg); \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_DATA0, lo); \
+    BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_DATA1, hi);
+
+

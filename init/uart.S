@@ -1,17 +1,14 @@
 /********  use t0, t1, t2 ,t3 ra ********/
 
-#include <loongson/loongson2f/uart.h>
 init_uart:
 	dli	t0, PHY_TO_UNCACHED(UART_ADDR)
 
-/****** set fifo mode *******/
-
+	/* set fifo mode */
 	li	t1, UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR |\
 			 UART_FCR_CLEAR_XMIT | UART_FCR_R_TRIG_00
 	sb	t1, UART_FCR(t0)
 
-/****** set baud rate ******/
-
+	/* set baud rate */
 	li	t2, UART_LCR_DLAB
 	sb	t2, UART_LCR(t0)
 	li	t3, UART_BAUD / (16 * B115200)
@@ -19,15 +16,15 @@ init_uart:
 	srl t3, 8
 	sb	t3, UART_DLH(t0)
 
-/****** set transmit format ******/
+	/* set transmit format */
 	li	t1, UART_LCR_WLEN8
 	sb	t1, UART_LCR(t0)	
 
-/******* set modem mode ******/
+	/* set modem mode */
 	li  t2, UART_MCR_RTS | UART_MCR_DTR
 	sb	t2, UART_MCR(t0)
 	
-/******* disable all intrrupt ******/
+	/* disable all intrrupt */
 	j 	ra
 	sb	zero, UART_IER(t0)
 endof_init_uart:
@@ -48,7 +45,8 @@ retry:
 	and	t2, UART_LSR_THRE
 	beq	t2, zero, retry
 	nop
-/******  can transmit now  *******/	
+
+	/* can transmit now */	
 	sb	a0, UART_TX(t0)
 11:
 	jr	ra
@@ -90,7 +88,7 @@ hexchar:
 /************************************************************/
 /******************** output a string ***********************/
 /************************************************************/
-/************************************************************/
+/**** a0, a3, ra, t8, use t0-t3 in uart_putc ******/
 uart_puts:
 	add	a3, ra, zero
 	addu 	t8, a0, OFFSET
