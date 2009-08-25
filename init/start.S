@@ -217,11 +217,6 @@ init_smb:
 	ori	a0, v0, SMB_ENABLE
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
 
-	/* send a stop, idle the bus */	
-	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
-	ori	a0, v0, SMB_STOP
-	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
-
 	/* clear all error status */
 	li	a0, 0xff
 	IO_OUTB(SMB_BASE_ADDR | SMB_STS);
@@ -232,46 +227,17 @@ init_smb:
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL_STS);
 		
 #if 1
-	IO_INB(SMB_BASE_ADDR | 0);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 1);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 2);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 3);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 4);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 5);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-	IO_INB(SMB_BASE_ADDR | 6);
-	add	a0, v0, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("\r\n");
-
 
 	/* check spd i2c value now*/
-//	bal smb_read
+
+	PRINTF("\r\ni2c 0xa0, index 0:0x");
+	li	a0, 0xa0
+	li	a1, 0x00
+	bal smb_read
 	nop
+	add	a0, v0, zero
+	bal	uart_put_hex
+	nop	
 
 #endif
 
@@ -290,19 +256,81 @@ init_smb:
  * a1: index
  * v0: return val
  * follow "random read" sequence description in cs5536 manual
- * use a0, a1, a2, a3, v0, v1, t5, t6, t7
+ * use a0, a1, v0, t5, t6, t7, use v1 in io_INB, use t0-t3 v0 in smb_wait
  */
 smb_read:
-	andi	a0, a0, 0xfe
-	add	t5, a0, zero
+	andi	t5, a0, 0xfe
 	add	t6, a1, zero
-	add	t7, ra, zero		
+	add	t7, ra, zero		# store return addr
 
 	/* start */
 	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
 	ori	a0, v0, SMB_START
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+	bal	smb_wait
+	nop
+	li		v1, 0xff
+	bnez	v0, error
+	nop
 
+	/* send slave addr */
+	add a0, t5, zero		
+	IO_OUTB(SMB_BASE_ADDR | SMB_SDA);
+	bal	smb_wait
+	nop
+	li		v1, 0xfe
+	bnez v0, error
+	nop
+
+	/* ack */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
+	ori	a0, v0, SMB_ACK
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+
+	/* send index */
+	add	a0, t6, zero
+	IO_OUTB(SMB_BASE_ADDR | SMB_SDA)
+	bal	smb_wait
+	nop
+	li		v1, 0xfd
+	bnez	v0, error
+	nop
+	
+	/* restart */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
+	ori	a0, v0, SMB_START
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+	bal	smb_wait
+	nop
+	li		v1, 0xfc
+	bnez	v0, error
+	nop
+
+	/* send slave addr */
+	ori a0, t5, 0x01		
+	IO_OUTB(SMB_BASE_ADDR | SMB_SDA);
+	bal	smb_wait
+	nop
+	li		v1, 0xfb
+	bnez v0, error
+	nop
+
+	/* stop */
+	li	a0, SMB_STOP
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+	bal smb_wait
+	nop
+	li		v1, 0xfa
+	bnez	v0, error
+	nop
+
+	/* read data */
+	li	v1, 0xf9
+	IO_INB(SMB_BASE_ADDR | SMB_SDA);
+	
+error:	
+	j	t7
+	nop	
 
 endof_smb_read:
 /**/
@@ -312,7 +340,9 @@ smb_write:
 endof_smb_write:
 
 /* smb wait and error check */
-/* use t1, t2, t3, t4, v0 */
+/* use t1, t2, t3, t4, v0, ra */
+/* return 0 means ok, 1 means error */
+
 smb_wait:
 	add	t4, ra, zero	# save ra first
 	li	t1, 1000		# this value is big enough
@@ -325,12 +355,12 @@ smb_wait:
 	lui		t3, 0xbfd0
 	ori		t3, (SMB_BASE_ADDR | SMB_STS)
 	lbu		v0, 0(t3)
-	andi	v0, (SMB_BER | SMB_NEGACK)
-	bnez	v0, 4f
-	nop
-	lbu		v0, 0(t3)
 	andi	v0, SMB_SDAST	# have transmit done or can receive now
 	bnez	v0, 3f
+	nop
+	lbu		v0, 0(t3)
+	andi	v0, (SMB_BER | SMB_NEGACK)
+	bnez	v0, 4f
 	nop
 	addiu	t1, t1, -1
 	bnez	t1, 1b

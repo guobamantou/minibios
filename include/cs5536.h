@@ -52,6 +52,9 @@
 #define SMB_CTRL3	0x06		
 
 /* SMB_CTRL1 */
+#define SMB_STASTRE	(1 << 7)
+#define SMB_NMINTE	(1 << 6)
+#define SMB_ACK		(1 << 4)
 #define SMB_STOP	(1 << 1)
 #define SMB_START	(1 << 0)
 
@@ -80,16 +83,4 @@
 #define GPIOL_OUT_AUX2_SEL	0x14
 #define GPIOL_IN_EN			0x20
 #define GPIOL_IN_AUX1_SEL	0x34
-
-
-
-
-
-
-
-
-
-
-
-
 
