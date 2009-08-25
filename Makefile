@@ -76,5 +76,6 @@ help:
 bak:
 	tar czf /tmp/minibios.tar.gz *
 	cp /tmp/minibios.tar.gz /mnt/sda5/
+	scp /mnt/sda5/minibios.tar.gz software@172.16.0.30:xiangy
 .PHONY : $(PHONY)
 

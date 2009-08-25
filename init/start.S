@@ -5,6 +5,7 @@
 #include <autoconf.h>
 #include <loongson/regdef.h>
 #include <loongson/addrspace.h>
+#include <loongson/prid.h>
 #include <uart.h>
 
 #ifdef CONFIG_LOONGSON2F
@@ -53,7 +54,32 @@ locate:
 	
 	bal	init_uart
 	nop
- 
+
+cpu_detect: 
+	mfc0	s0, CP0_PRID
+	li	a0,	LOONGSON2F_PRID	
+	beq	a0, s0, loongson2f
+	nop
+	li	a0,	LOONGSON2E_PRID	
+	beq	a0, s0, loongson2e
+	nop
+	li	a0,	LOONGSON2G_PRID	
+	beq	a0, s0, loongson2g
+	nop
+loongson2e:
+	PRINTF("LOONGSON 2E founded!\r\n");	
+	PRINTF("NOT SUPPORT\r\n");	
+	b	init_nb
+	nop	
+loongson2f:
+	PRINTF("LOONGSON 2F founded!\r\n");	
+	b	init_nb
+	nop	
+loongson2g:
+	PRINTF("LOONGSON 2G founded!\r\n");	
+	b	init_nb
+	nop	
+
 init_nb:
 	/* init north bridge(virtual?) */
 	PRINTF("INIT North Bridge\r\n");
