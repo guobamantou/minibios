@@ -14,6 +14,7 @@
 #include <loongson/loongson2f/uart.h>
 #include <loongson/loongson2f/pciconf.h>
 #include <loongson/loongson2f/io.h>
+#include <loongson/loongson2f/exc_code.h>
 #endif
 
 #if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
@@ -44,8 +45,152 @@ _start:
 	bal	locate
 	nop
 
+/* in addr 0xbfc00200*/
+.align 9
+tlb_exc:
+	PRINTF("XTLB refill exception!!!\r\n");
+	bal	dump_reg	
+	nop
 
-/*************** I conside *******************/
+/* locate in addr 0xbfc00300*/
+.align	8
+	nop
+	nop
+/* locate in addr 0xbfc00380*/
+.align	7
+other_exc:
+	PRINTF("other  exception!!!\r\n");
+dump_reg:	
+	PRINTF("cause reg : 0x");
+	mfc0	a0, CP0_CAUSE
+	bal		uart_put_hex
+	nop
+	PRINTF("\r\n      EPC : 0x");
+	mfc0	a0, CP0_EPC
+	bal		uart_put_hex
+	nop
+	PRINTF("\r\n Exc-Code : 0x");
+	mfc0	s0, CP0_CAUSE
+	andi	s0, EXC_CODE 
+	srl		s0, s0, 2	
+	add		a0, s0, zero
+	bal		uart_put_hex
+	nop
+	PRINTF("\r\n");
+
+	li	a0, EXC_INT
+	bne	a0, s0, 1f
+	nop
+	PRINTF("a interrupt occur ??\r\n");	
+	b	stop
+	nop
+1:
+	li	a0, EXC_MOD
+	bne	a0, s0, 1f		
+	nop
+	PRINTF("exception when modify TLB ??\r\n");	
+	b	stop
+	nop
+1:
+	li	a0, EXC_TLBL
+	bne	a0, s0, 1f
+	nop
+	PRINTF("TLB exception when load ??\r\n");	
+	b	stop
+	nop
+1:
+	li	a0, EXC_TLBS
+	bne	a0, s0, 1f
+	nop
+	PRINTF("TLB exception when store ??\r\n");
+	b	stop
+	nop	
+1:
+	li	a0, EXC_ADEL
+	bne	a0, s0, 1f
+	nop
+	PRINTF("addr error when load ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_ADES
+	bne	a0, s0, 1f
+	nop
+	PRINTF("addr error when store ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_IBE
+	bne	a0, s0, 1f
+	nop
+	PRINTF("bus error when read instruction ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_DBE
+	bne	a0, s0, 1f
+	nop
+	PRINTF("bus error when load/store data ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_SYS
+	bne	a0, s0, 1f
+	nop
+	PRINTF("sys-call exception ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_BP
+	bne	a0, s0, 1f
+	nop
+	PRINTF("break point ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_RI
+	bne	a0, s0, 1f
+	nop
+	PRINTF("reserved instruction ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_CPU
+	bne	a0, s0, 1f
+	nop
+	PRINTF("can not use co-processor ??\r\n");	
+	b	stop
+	nop	
+1:
+	li	a0, EXC_OV
+	bne	a0, s0, 1f
+	nop
+	PRINTF("arithmetic overflow ??\r\n");
+	b	stop
+	nop	
+1:
+	li	a0, EXC_TR
+	bne	a0, s0, 1f
+	nop
+	PRINTF("trap exception ??\r\n");
+	b	stop
+	nop	
+1:
+	li	a0, EXC_FPE
+	bne	a0, s0, 1f
+	nop
+	PRINTF("float-point exception ??\r\n");	
+	b	stop
+	nop	
+1:
+	PRINTF("unknown exception ^.^\r\n");
+	b stop
+	nop
+	
+stop:
+	b	stop
+	nop
+
 locate:
 	la	s0, _start
 	subu	OFFSET, ra, s0
@@ -54,6 +199,7 @@ locate:
 	
 	bal	init_uart
 	nop
+
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID
@@ -88,7 +234,7 @@ init_nb:
 #endif
 
 #if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
-
+detect_cs5536:
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	dli	a0, CS5536ID
 	beq a0, v0, 22f
@@ -134,6 +280,7 @@ init_nb:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
+	PRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
 	
