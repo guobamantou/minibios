@@ -45,21 +45,47 @@ _start:
 	bal	locate
 	nop
 
+### every string len is 25 bytes ,dont change ###
+#define EXC_STR_LEN		25
+
+exc_int:
+.asciz "an interrupt occur    \r\n"
+exc_mod:
+.asciz "modify TLB exception  \r\n"
+exc_tlbl:
+.asciz "TLB load exception    \r\n"
+exc_tlbs:
+.asciz "TLB store exception   \r\n"
+exc_adel:
+.asciz "addr error when load  \r\n"
+exc_ades:
+.asciz "addr error when store \r\n"
+exc_ibe:
+.asciz "bus err:read instruct \r\n"
+exc_dbe:
+.asciz "bus err:read/wr data  \r\n"	
+exc_sys:
+.asciz "syscall exception     \r\n"
+exc_bp:
+.asciz "break point           \r\n"
+exc_ri:
+.asciz "reserved instruction  \r\n"
+exc_cpu:
+.asciz "cant use co-processor \r\n"
+exc_ov:
+.asciz "arithmetic overflow   \r\n"
+exc_tr:
+.asciz "trap exception\r\n"
+exc_fpe:
+.asciz "float-point exception\r\n"
+exc_watch:
+.asciz "watch exception\r\n"
+
 /* in addr 0xbfc00200*/
 .align 9
 tlb_exc:
-	PRINTF("XTLB refill exception!!!\r\n");
-	bal	dump_reg	
-	nop
+	PRINTF("XTLB refill exception!\r\n");
 
-/* locate in addr 0xbfc00300*/
-.align	8
-	nop
-	nop
-/* locate in addr 0xbfc00380*/
-.align	7
-other_exc:
-	PRINTF("other  exception!!!\r\n");
 dump_reg:	
 	PRINTF("cause reg : 0x");
 	mfc0	a0, CP0_CAUSE
@@ -78,110 +104,33 @@ dump_reg:
 	nop
 	PRINTF("\r\n");
 
-	li	a0, EXC_INT
-	bne	a0, s0, 1f
+detail:
+	sltiu	a0, s0, (EXC_TR + 1)		
+	beq		a0, zero, 1f	# >EXC_TR
 	nop
-	PRINTF("a interrupt occur ??\r\n");	
+	la		a0, exc_int 
+	li		s1,	EXC_STR_LEN
+	mul		s1,	s0, s1
+	nop
+	add		a0, s1
+	bal		uart_puts
+	nop
 	b	stop
 	nop
 1:
-	li	a0, EXC_MOD
-	bne	a0, s0, 1f		
+	li		a0, EXC_FPE
+	bne		a0, s0, 1f
 	nop
-	PRINTF("exception when modify TLB ??\r\n");	
-	b	stop
-	nop
-1:
-	li	a0, EXC_TLBL
-	bne	a0, s0, 1f
-	nop
-	PRINTF("TLB exception when load ??\r\n");	
-	b	stop
+	la		a0, exc_fpe
+	bal		uart_puts
 	nop
 1:
-	li	a0, EXC_TLBS
-	bne	a0, s0, 1f
+	li		a0, EXC_WATCH
+	bne		a0, s0, 1f
 	nop
-	PRINTF("TLB exception when store ??\r\n");
-	b	stop
-	nop	
-1:
-	li	a0, EXC_ADEL
-	bne	a0, s0, 1f
+	la		a0, exc_fpe
+	bal		uart_puts
 	nop
-	PRINTF("addr error when load ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_ADES
-	bne	a0, s0, 1f
-	nop
-	PRINTF("addr error when store ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_IBE
-	bne	a0, s0, 1f
-	nop
-	PRINTF("bus error when read instruction ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_DBE
-	bne	a0, s0, 1f
-	nop
-	PRINTF("bus error when load/store data ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_SYS
-	bne	a0, s0, 1f
-	nop
-	PRINTF("sys-call exception ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_BP
-	bne	a0, s0, 1f
-	nop
-	PRINTF("break point ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_RI
-	bne	a0, s0, 1f
-	nop
-	PRINTF("reserved instruction ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_CPU
-	bne	a0, s0, 1f
-	nop
-	PRINTF("can not use co-processor ??\r\n");	
-	b	stop
-	nop	
-1:
-	li	a0, EXC_OV
-	bne	a0, s0, 1f
-	nop
-	PRINTF("arithmetic overflow ??\r\n");
-	b	stop
-	nop	
-1:
-	li	a0, EXC_TR
-	bne	a0, s0, 1f
-	nop
-	PRINTF("trap exception ??\r\n");
-	b	stop
-	nop	
-1:
-	li	a0, EXC_FPE
-	bne	a0, s0, 1f
-	nop
-	PRINTF("float-point exception ??\r\n");	
-	b	stop
-	nop	
 1:
 	PRINTF("unknown exception ^.^\r\n");
 	b stop
@@ -189,6 +138,13 @@ dump_reg:
 	
 stop:
 	b	stop
+	nop
+/* locate in addr 0xbfc00380*/
+
+.align	7
+other_exc:
+	PRINTF("other exception !\r\n");
+	bal	dump_reg
 	nop
 
 locate:
@@ -199,7 +155,6 @@ locate:
 	
 	bal	init_uart
 	nop
-
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID
