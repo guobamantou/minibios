@@ -7,8 +7,7 @@ ddr2_cfg:
 	/* enable memory cfg */
 	dli	a0, PHY_TO_UNCACHED(CHIP_CFG)	
 	ld	v0, 0(a0)
-	dli	v1, 0x4ff
-	and	v0, v0, v1
+	andi	v0, v0, 0x4ff
 	sd	v0, 0(a0)
 
 ddr2_reg_write:
@@ -20,11 +19,10 @@ ddr2_reg_write:
 next_reg:
 	ld	a1, 0(v0)
 	sd	a1, 0(v1)
-	addiu	v0, v0, 0x08
-	addiu	v1, v1, 0x10 
 	addi	a0, a0, -1
+	addiu	v0, v0, 0x08
 	bnez	a0, next_reg
-	nop
+	addiu	v1, v1, 0x10 
 
 #### adjust some special ddr2 cfg reg ####
 
@@ -98,10 +96,8 @@ not_locked:
 	dli	a0, PHY_TO_UNCACHED(CHIP_CFG)
 	ld	v0, 0x0(a0)
 	ori	v0, 1
-	sd	v0, 0x0(a0)
-
 	j	s5
-	nop
+	sd	v0, 0x0(a0)
 
 
 ############ NOTICE: LITTLE-END #################

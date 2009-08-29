@@ -55,18 +55,15 @@ locate:
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
 	lw	v1, 0(v0)
 	dli	a0, 0xffffe083
-	dli	a1, 0x0f0c
 	and	v1, v1, a0
-	or	v1, v1, a1
+	ori	v1, v1, 0x0f0c
 	sw	v1, 0(v0)
 
 	la	s0, _start
 	subu	OFFSET, ra, s0
 	lui	s1, 0xffff
-	and	OFFSET, s1    ### OFFSET is offset of PHYADDR and VIRTUREADDR in the eye of cpu
-	
 	bal	init_uart
-	nop
+	and	OFFSET, s1  ## offset of PHYADDR and VIRTUREADDR 
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID
@@ -156,6 +153,24 @@ detect_cs5536:
 	PRINTF("init ddr2 now!\r\n");
 	bal	ddr2_cfg
 	nop
+
+#if 1
+       li      s0, 0x0
+2:
+       dli     s1, 0xfffff
+1:
+       addiu s1, -1
+       bnez    s1, 1b
+       nop
+       add     a0, s0, zero
+       bal     uart_put_hex
+       nop
+       PRINTF("\r\n");
+       addi    s0, 1
+       b 2b
+       nop
+#endif
+
 
 
 #if 0

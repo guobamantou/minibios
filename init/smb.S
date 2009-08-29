@@ -114,9 +114,9 @@ endof_smb_read:
 
 smb_wait:
 	add	t4, ra, zero	# save ra first
-	li	t1, 100			# i dont know how many times is needed
+	li	t1, 1000		# i dont know how many times is needed
 1:		
-	li	t2, 1000
+	li	t2, 100
 2:
 	addiu	t2, t2, -1
 	bnez	t2, 2b		# dont use delay slot here
