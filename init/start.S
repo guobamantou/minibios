@@ -147,7 +147,25 @@ detect_cs5536:
 	PRINTF("init ddr2 now!\r\n");
 	bal	ddr2_cfg
 	nop
-	
+	PRINTF("rom accelerate!\r\n");
+#if 1
+	li	s0, 0x0
+2:
+	dli	s1, 0xfffff
+1:
+	addiu s1, -1
+	bnez	s1, 1b
+	nop
+	add	a0, s0, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("\r\n");
+	addi	s0, 1
+	b 2b
+	nop
+#endif
+
+
 	/* rom accelerate */
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
 	lw	v1, 0(v0)
@@ -156,8 +174,8 @@ detect_cs5536:
 	and	v1, v1, a0
 	or	v1, v1, a1
 	sw	v1, 0(v0)
-	
-	
+
+
 #if 0
 get_memsize:
 	li	a0, 0xa0

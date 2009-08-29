@@ -14,7 +14,7 @@ ddr2_cfg:
 ddr2_reg_write:
 	li	a0,	DDR2_CTRL_REG_NUM	## counter
 	la	v0, DDR2_CTRL00_LO
-	add	v0, v0, OFFSET		# v0 is source data addr 
+	add	v0, v0, OFFSET			## v0 is source data addr 
 	dli	v1, PHY_TO_UNCACHED(DDR2_CTRL_REG_BASE) # v1 is config reg base addr
 	
 next_reg:
