@@ -114,7 +114,7 @@ endof_smb_read:
 
 smb_wait:
 	add	t4, ra, zero	# save ra first
-	li	t1, 10			# i dont know how many times is needed
+	li	t1, 100			# i dont know how many times is needed
 1:		
 	li	t2, 1000
 2:
