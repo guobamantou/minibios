@@ -4,12 +4,12 @@
 ddr2_cfg:
 	add	s5, ra, zero		# store ra to s5
 
+	/* enable memory cfg */
 	dli	a0, PHY_TO_UNCACHED(CHIP_CFG)	
 	ld	v0, 0(a0)
 	dli	v1, 0x4ff
 	and	v0, v0, v1
 	sd	v0, 0(a0)
-/* I dont know the code above ,just follow pmon */
 
 ddr2_reg_write:
 	li	a0,	DDR2_CTRL_REG_NUM	## counter
@@ -58,8 +58,7 @@ next_reg:
 	bal	smb_read
 	nop
 
-	li	a0, 0x7
-	and	a0, a0, v0 			## low 3 bits represent rank num -1
+	andi	a0, v0, 0x7 			## low 3 bits represent rank num -1
 	li	a1, 0x2
 	sllv	a1, a1, a0
 	addi	a1, -1 			## DDR2_CTRL_70[19:16] = 2^(rank) -1 
@@ -88,6 +87,18 @@ next_reg:
 	dli	v0, (1 << 40)
 	or	a0, v0
 	sd	a0, 0x30(s6)
+
+not_locked:
+	ld	v0, 0x10(s6)
+	andi	v0, 1
+	beq	v0, zero, not_locked	## memory can accesss until dll locked
+	nop
+
+	/* after complete config, disable ddr2 config */
+	dli	a0, PHY_TO_UNCACHED(CHIP_CFG)
+	ld	v0, 0x0(a0)
+	ori	v0, 1
+	sd	v0, 0x0(a0)
 
 	j	s5
 	nop
