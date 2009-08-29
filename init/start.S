@@ -154,25 +154,6 @@ detect_cs5536:
 	bal	ddr2_cfg
 	nop
 
-#if 1
-       li      s0, 0x0
-2:
-       dli     s1, 0xfffff
-1:
-       addiu s1, -1
-       bnez    s1, 1b
-       nop
-       add     a0, s0, zero
-       bal     uart_put_hex
-       nop
-       PRINTF("\r\n");
-       addi    s0, 1
-       b 2b
-       nop
-#endif
-
-
-
 #if 0
 get_memsize:
 	li	a0, 0xa0
