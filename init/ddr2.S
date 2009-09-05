@@ -45,7 +45,11 @@ next_reg:
 
 	dli	a0, ((14 << 24) | (15 << 8))
 	sub	a0, a0, s7
-	sd	a0, 0x50(s6)
+	lw	v0, 0x50(s6)
+	dli	a1, 0xf8fff8ff  ## clear relative bits
+	and v0, a1
+	or	a0, v0, a0
+	sw	a0, 0x50(s6)
 
 ## according to spd standard R1.2, rank num is 1~8 ##
 ## but loongson2f seem support only 4 rank most ##
@@ -69,7 +73,7 @@ next_reg:
 
 	/* get bank num */
 	li	a0, 0xa0
-	li	a1, 11 
+	li	a1, 0x11 
 	bal	smb_read
 	nop
 	li	v1, 0x8

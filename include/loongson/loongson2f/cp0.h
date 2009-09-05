@@ -34,6 +34,14 @@
 #define CP0_ERROREPC	$30
 
 /**** status register bit define *****/
-#define STATUS_IE		1<<0
-#define STATUS_KSU		3<<3
-#define STATUS_BEV		1<<22
+#define STATUS_IE		(1 << 0)
+#define STATUS_KSU		(3 << 3)
+#define STATUS_BEV		(1 << 22)
+
+
+/** CPO_CONFIG **/
+#define KSEG0_CACHETYPE	(7 << 0)
+#define DCACHE_SIZE		(7 << 6)
+#define ICACHE_SIZE		(7 << 9)
+#define DCACHE_LINE_SIZE	(1 << 4)
+#define ICACHE_LINE_SIZE	(1 << 5)
