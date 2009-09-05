@@ -9,14 +9,16 @@ init_cache:
 
 init_icache:
 	andi	t0, a0, ICACHE_SIZE
+	srl		t0, ICACHE_SIZE_START_BIT
 	andi	t1, a0, ICACHE_LINE_SIZE
+	srl		t1, ICACHE_LINE_SIZE_START_BIT
 	li	t2, (2 << 6)	## index num = 2^(6 + t0 -t1)
 	sub	t0, t0, t1
 	sllv	t2, t2, t0	## t2 is index num now
+
 	li	t0, 16
 	sllv	t1, t0, t1	## t1 is icache line size 
-
-	li	t0, 0			## t0 use as 'VA'
+	lui	t0, 0x8000		## t0 use as 'VA'
 1:
 	cache	I_INDEX_INVALIDATE, 0(t0)	
 	cache	I_INDEX_INVALIDATE, 1(t0)	
@@ -28,14 +30,16 @@ init_icache:
 
 init_dcache:
 	andi	t0, a0, DCACHE_SIZE
+	srl		t0, DCACHE_SIZE_START_BIT
 	andi	t1, a0, DCACHE_LINE_SIZE
+	srl		t1, DCACHE_SIZE_START_BIT
 	li	t2, (2 << 6)	## index num = 2^(6 + t0 -t1)
 	sub	t0, t0, t1
 	sllv	t2, t2, t0	## t2 is index num now
 	li	t0, 16
 	sllv	t1, t0, t1	## t1 is icache line size 
 
-	li	t0, 0			## t0 use as 'VA'
+	lui	t0, 0x8000		## t0 use as 'VA'
 	mtc0	zero, CP0_TAGHI	
 	mtc0	zero, CP0_TAGLO		## set state bits to 00(invalid)
 1:
@@ -52,7 +56,7 @@ init_l2cache:
 	li	t2, (1 << 12)	## index num = 2^12
 	li	t1, 32
 
-	li	t0, 0			## t0 use as 'VA'
+	lui	t0, 0x8000		## t0 use as 'VA'
 	mtc0	zero, CP0_TAGHI	
 	mtc0	zero, CP0_TAGLO		## no other purpose, set state bits
 1:

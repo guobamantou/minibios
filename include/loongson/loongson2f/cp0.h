@@ -40,8 +40,12 @@
 
 
 /** CPO_CONFIG **/
-#define KSEG0_CACHETYPE	(7 << 0)
-#define DCACHE_SIZE		(7 << 6)
-#define ICACHE_SIZE		(7 << 9)
+#define KSEG0_CACHETYPE		(7 << 0)
+#define DCACHE_SIZE			(7 << 6)
+#define ICACHE_SIZE			(7 << 9)
 #define DCACHE_LINE_SIZE	(1 << 4)
 #define ICACHE_LINE_SIZE	(1 << 5)
+#define DCACHE_SIZE_START_BIT	6
+#define ICACHE_SIZE_START_BIT	9
+#define DCACHE_LINE_SIZE_START_BIT	4
+#define ICACHE_LINE_SIZE_START_BIT	5

@@ -155,90 +155,44 @@ detect_cs5536:
 	bal	ddr2_cfg
 	nop
 
-#if 0
 	PRINTF("init cache now!\r\n");
 	bal	init_cache
 	nop
+
+#if 0
+	mfc0	a0, CP0_CONFIG
+	dli		a1, 0xfffffff8	## dont afraid, use 32bit in deed
+	and 	a0, a0, a1
+	ori		a0, 3
+	mtc0	a0, CP0_CONFIG
 #endif
 
 #if 1
-	PRINTF("test mem...........\r\n");
-
-	PRINTF("write mem to 0\r\n");
-	dli	s0, PHY_TO_UNCACHED(0x0000)
-	dli	s1, PHY_TO_UNCACHED(0x00001000)
-
-write:
-1:
-	PRINTF("write 0x");
-	add	a0, s0, zero
-	bal uart_put_hex
-	nop 
-	PRINTF("\r\n");
-	sd	zero, 0(s0) 
-	addi	s0, 8
-	bne	s0, s1, 1b
-	nop 
-
-	PRINTF("read mem and check\r\n");
-	dli	s0, PHY_TO_UNCACHED(0x0000)
-	dli	s1, PHY_TO_UNCACHED(0x00001000)
-
-read:
-1:
-	PRINTF("check 0x");
-	add	a0, s0, zero
-	bal uart_put_hex
-	nop 
-	PRINTF("\r\n");
-	ld	v0, 0(s0) 
-	bnez	v0, wrong
-	addi	s0, 8
-	bne	s0, s1, 1b 
-	nop 
-
-
 	PRINTF("write mem to 1\r\n");
-	dli	s0, PHY_TO_UNCACHED(0x0000)
-	dli	s1, PHY_TO_UNCACHED(0x00001000)
-
+	li	s2, 0
+	li	s3, 100
+start:
+	dli	s0, PHY_TO_CACHED(0x0000)
+	dli	s1, PHY_TO_CACHED(0x00010000)
+	
 1:
-	PRINTF("write 0x");
-	add	a0, s0, zero
-	bal uart_put_hex
-	nop 
-	PRINTF("\r\n");
-
 	dli	v0, 0xffffffffffffffff
 	sd	v0, 0(s0) 
 	addi	s0, 8
 	bne	s0, s1, 1b
 	nop 
 
-	PRINTF("read mem and check\r\n");
-	dli	s0, PHY_TO_UNCACHED(0x0000)
-	dli	s1, PHY_TO_UNCACHED(0x00001000)
-
-1:
-	PRINTF("check 0x");
-	add	a0, s0, zero
-	bal uart_put_hex
-	nop 
-	PRINTF("\r\n");
-
-	dli	v1, 0xffffffffffffffff
-	ld	v0, 0(s0) 
-	sub	v0, v0, v1
-	bnez	v0, 1f 
-	addi	s0, 8
-	bne	s0, s1, 1b 
-	nop 
-
-wrong:
-	PRINTF("test error\r\n");
+	add a0, s2, zero
+	bal	uart_put_hex
+	nop
+	PRINTF("times\r\n");
+	nop
+	addi s2, 1
+	bne	s3, s2, start
 	nop
 
 #endif
+
 #if 0
 get_memsize:
 	li	a0, 0xa0
