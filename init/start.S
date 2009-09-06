@@ -159,40 +159,71 @@ detect_cs5536:
 	bal	init_cache
 	nop
 
-#if 0
+	/*enable cache*/
 	mfc0	a0, CP0_CONFIG
 	dli		a1, 0xfffffff8	## dont afraid, use 32bit in deed
 	and 	a0, a0, a1
 	ori		a0, 3
 	mtc0	a0, CP0_CONFIG
-#endif
 
 #if 1
 	PRINTF("write mem to 1\r\n");
 	li	s2, 0
-	li	s3, 100
+	li	s3, 1
 start:
 	dli	s0, PHY_TO_CACHED(0x0000)
-	dli	s1, PHY_TO_CACHED(0x00010000)
+	dli	s1, PHY_TO_CACHED(0x00000080)
 	
 1:
 	dli	v0, 0xffffffffffffffff
-	sd	v0, 0(s0) 
+	ld	v0, 0(s0) 
 	addi	s0, 8
 	bne	s0, s1, 1b
 	nop 
 
-	add a0, s2, zero
-	bal	uart_put_hex
-	nop
-	PRINTF("times\r\n");
-	nop
 	addi s2, 1
 	bne	s3, s2, start
 	nop
 
 #endif
+	
+	PRINTF("DONE\r\n");
+#if 1
+	li	s2, 10	## t2 is index num now
+	li	s1, 32	## t1 is icache line size 
 
+	lui	s0, 0x8000		## t0 use as 'VA'
+1:
+	cache	D_INDEX_LOAD_TAG, 0(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+	cache	D_INDEX_LOAD_TAG, 1(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+
+	cache	D_INDEX_LOAD_TAG, 2(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+
+	cache	D_INDEX_LOAD_TAG, 3(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("\r\n");
+
+	addiu	s2, -1
+	bnez	s2, 1b
+	add	s0, s0, s1		## next index
+
+#endif
+
+	PRINTF("done");
 #if 0
 get_memsize:
 	li	a0, 0xa0

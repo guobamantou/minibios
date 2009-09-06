@@ -4,4 +4,4 @@
 #define D_INDEX_LOAD_TAG	0x05
 #define D_INDEX_STORE_TAG	0x09
 
-#define S_INDEX_STORE_TAG	0x1d
+#define S_INDEX_STORE_TAG	0x0b
