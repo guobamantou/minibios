@@ -171,12 +171,12 @@ detect_cs5536:
 	li	s2, 0
 	li	s3, 1
 start:
-	dli	s0, PHY_TO_CACHED(0x0000)
-	dli	s1, PHY_TO_CACHED(0x00000080)
+	dli	s0, PHY_TO_CACHED(0x1000000)
+	dli	s1, PHY_TO_CACHED(0x1000f00)
 	
 1:
 	dli	v0, 0xffffffffffffffff
-	ld	v0, 0(s0) 
+	sd	v0, 0(s0) 
 	addi	s0, 8
 	bne	s0, s1, 1b
 	nop 
