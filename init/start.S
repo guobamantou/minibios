@@ -36,7 +36,7 @@
 	nop
 
 /************************   start here  ************************/
-stack = 0x90000000-0x100000
+stack = 0xffffffff90000000-0x100000
 _start:
 	mtc0	zero, CP0_STATUS 
 	mtc0	zero, CP0_CAUSE 
@@ -166,112 +166,37 @@ detect_cs5536:
 	ori		a0, 3
 	mtc0	a0, CP0_CONFIG
 
-#if 1
-	PRINTF("write mem to 1\r\n");
-	li	s2, 0
-	li	s3, 1
-start:
-	dli	s0, PHY_TO_CACHED(0x000000)
-	dli	s1, PHY_TO_CACHED(0x0000e0)
-	
-1:
-	dli	v0, 0xffffffffffffffff
-	ld	v0, 0(s0) 
-	addi	s0, 8
-	bne	s0, s1, 1b
-	nop 
+	PRINTF("COPY IMAGE TO MEMORY........\r\n");
+	la	v0, _ftext		##  start addr
+	la	v1, _edata		##  data end addr(bss is special)
 
-	addi s2, 1
-	bne	s3, s2, start
+	dli	s0, 0xffffffffbfc00000
+
+	/* copy text and data section */
+1:	ld	a0, 0(s0)
+	sd	a0, 0(v0)
+	addiu	v0, 8
+	bne	v0, v1, 1b
+	addiu	s0, 8
+
+	/* create bss section */	
+	la	v1 , _end		##  data end addr(bss is special)
+	beq v0, v1, 2f
+	nop
+1:	
+	sd	zero, 0(v0)	
+	addiu	v0, 8
+	bne	v0, v1, 1b
+	nop
+		
+2:	
+	PRINTF("start.S done\r\n");
+
+	la	v0, main
+	jalr	v0
 	nop
 
-#endif
-	
-	PRINTF("DONE\r\n");
-#if 1
-	li	s2, 10	## t2 is index num now
-	li	s1, 32	## t1 is icache line size 
-
-	lui	s0, 0x8000		## t0 use as 'VA'
-1:
-	cache	S_INDEX_LOAD_TAG, 0(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-	cache	S_INDEX_LOAD_TAG, 1(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-
-	cache	S_INDEX_LOAD_TAG, 2(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-
-	cache	S_INDEX_LOAD_TAG, 3(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("\r\n");
-
-	addiu	s2, -1
-	bnez	s2, 1b
-	add	s0, s0, s1		## next index
-
-	PRINTF("l1\r\n");
-	li	s2, 10	## t2 is index num now
-	li	s1, 32	## t1 is icache line size 
-
-	lui	s0, 0x8000		## t0 use as 'VA'
-1:
-	cache	D_INDEX_LOAD_TAG, 0(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-	cache	D_INDEX_LOAD_TAG, 1(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-
-	cache	D_INDEX_LOAD_TAG, 2(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("      ");
-
-	cache	D_INDEX_LOAD_TAG, 3(s0)	
-	mfc0	a0, CP0_TAGLO
-	bal		uart_put_hex
-	nop
-	PRINTF("\r\n");
-
-	addiu	s2, -1
-	bnez	s2, 1b
-	add	s0, s0, s1		## next index
-
-
-#endif
-
-	PRINTF("done");
-#if 0
-get_memsize:
-	li	a0, 0xa0
-	li	a1, 31
-	bal	smb_read
-	srl	s0, v0, 5   ### ranksize(byte) = ((val >> 5) | (val & 0x1f)<<3) << 27
-	andi s1,v0, 0x1f
-	sll s1, s1, 3
-	or	s1, s0
-	sll	a0, s1, 7
-	bal	uart_put_hex
-	nop
-	PRINTF("MB\r\n");
-#endif
+######## should never come back ########
 2:
 	b	2b
 	nop
