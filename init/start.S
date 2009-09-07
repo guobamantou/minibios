@@ -171,12 +171,12 @@ detect_cs5536:
 	li	s2, 0
 	li	s3, 1
 start:
-	dli	s0, PHY_TO_CACHED(0x1000000)
-	dli	s1, PHY_TO_CACHED(0x1000f00)
+	dli	s0, PHY_TO_CACHED(0x000000)
+	dli	s1, PHY_TO_CACHED(0x0000e0)
 	
 1:
 	dli	v0, 0xffffffffffffffff
-	sd	v0, 0(s0) 
+	ld	v0, 0(s0) 
 	addi	s0, 8
 	bne	s0, s1, 1b
 	nop 
@@ -189,6 +189,39 @@ start:
 	
 	PRINTF("DONE\r\n");
 #if 1
+	li	s2, 10	## t2 is index num now
+	li	s1, 32	## t1 is icache line size 
+
+	lui	s0, 0x8000		## t0 use as 'VA'
+1:
+	cache	S_INDEX_LOAD_TAG, 0(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+	cache	S_INDEX_LOAD_TAG, 1(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+
+	cache	S_INDEX_LOAD_TAG, 2(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("      ");
+
+	cache	S_INDEX_LOAD_TAG, 3(s0)	
+	mfc0	a0, CP0_TAGLO
+	bal		uart_put_hex
+	nop
+	PRINTF("\r\n");
+
+	addiu	s2, -1
+	bnez	s2, 1b
+	add	s0, s0, s1		## next index
+
+	PRINTF("l1\r\n");
 	li	s2, 10	## t2 is index num now
 	li	s1, 32	## t1 is icache line size 
 
@@ -220,6 +253,7 @@ start:
 	addiu	s2, -1
 	bnez	s2, 1b
 	add	s0, s0, s1		## next index
+
 
 #endif
 
