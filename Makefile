@@ -26,31 +26,32 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
-MINIBIOSINCLUDE = $(src)/include  -I $(src)/board/loongson2f-yeeloong-8089/include
+MINIBIOSINCLUDE = $(src)/include  -I board/loongson2f-yeeloong-8089/include
 
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 
-head-y = $(src)/init/start
-
 minibios-head = $(head-y)
 minibios-main = $(core-y) $(libs-y) $(drivers-y)
-minibios-lds  = $(src)/board/loongson2f-yeeloong-8089/ld.script
+minibios-lds  = board/loongson2f-yeeloong-8089/ld.script
 
 export src obj
 export MINIBIOSVERSION
 all:	minibios Makefile
 include util/Makefile
 include init/Makefile
-
+include lib/Makefile
 
 PHONY += all
-minibios: ctags $(minibios-lds) $(minibios-head) $(minibios-main)
+minibios:  $(minibios-lds) 
+minibios:  $(minibios-head) $(minibios-main)
+	$(LD) $^ -o minibios -e _start -T $(minibios-lds)
+	$(OBJCOPY) -O binary minibios minibios.rom 
 	cp minibios.rom /tftpboot
 	cp minibios /tftpboot
+PHONY += ctags
 ctags: clean
 	ctags -R
-
 PHONY += prepare
 prepare:
 	@rm -rf $(obj)
@@ -72,9 +73,12 @@ clean:
 	rm -rf $(src)/minibios.rom
 PHONY += help 
 help:
+	@echo  "make "
 	@echo  "make menuconfig"
-	@echo  "make rom"
-	@echo  "           get minibios.bin as result"
+	@echo  "make clean"
+	@echo  "make cleanconfig"
+	@echo  "make bak"
+	@echo  "make ctags"
 bak:
 	tar czf /tmp/minibios.tar.gz *
 	cp /tmp/minibios.tar.gz /mnt/sda5/

@@ -1,6 +1,9 @@
 #include <types.h>
 #include <uart.h>
+#include <autoconf.h>
+#ifdef CONFIG_LOONGSON2F
 #include <loongson/loongson2f/uart.h>
+#endif
 #include <loongson/addrspace.h>
 
 #define CONS_BAUD B115200
