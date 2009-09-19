@@ -12,6 +12,13 @@ config LOONGSON2G
 endchoice
 endmenu
 
+menu "cpu function selection"
+config ENABLE_CACHE
+	bool "enable cache"
+	help
+		enable cache in minibios	
+endmenu
+
 menu "Board selection"
 config LOONGSON2F_FULOONG
 	bool "Loongson2F fuloong"

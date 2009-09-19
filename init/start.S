@@ -159,12 +159,14 @@ detect_cs5536:
 	bal	init_cache
 	nop
 
+#ifdef CONFIG_ENABLE_CACHE
 	/*enable cache*/
 	mfc0	a0, CP0_CONFIG
 	dli		a1, 0xfffffff8	## dont afraid, use 32bit in deed
 	and 	a0, a0, a1
 	ori		a0, 3
 	mtc0	a0, CP0_CONFIG
+#endif
 
 	PRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr

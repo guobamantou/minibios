@@ -1,4 +1,5 @@
-libs-y := lib/early_printf.o
+libs-y := lib/early_printf.o lib/printf.o lib/string.o
 
-lib/early_printf.o: lib/early_printf.c $(src)/include/stdio.h lib/Makefile
+%.o: %.c lib/Makefile
 	$(CC) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@	
+
