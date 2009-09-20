@@ -14,6 +14,7 @@
 /*
  * DLAB=0
  */
+
 #define UART_RX		0	/* In:  Receive buffer */
 #define UART_TX		0	/* Out: Transmit buffer */
 
@@ -327,4 +328,5 @@
 #define B38400  38400
 #define B57600  57600
 #define B115200 115200
+
 

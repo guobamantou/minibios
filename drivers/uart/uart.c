@@ -7,7 +7,7 @@
 #include <loongson/addrspace.h>
 
 #define CONS_BAUD B115200
-u8* UART_BASE = PHY_TO_UNCACHED(UART_ADDR);
+u8* UART_BASE = (unsigned long)PHY_TO_UNCACHED((unsigned long)UART_ADDR);
 
 void uart_out(u32 port, u8 c)
 {
@@ -19,7 +19,7 @@ u8 uart_in(u32 port)
 	return *(u8 *)(UART_BASE + port);
 }
 
-void init_uart()
+void init_uart(void)
 {
 	uart_out(UART_FCR, UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT | UART_FCR_R_TRIG_00);
 	uart_out(UART_LCR, UART_LCR_DLAB);
@@ -30,6 +30,7 @@ void init_uart()
 	uart_out(UART_IER, 0);
 }
 
+void uart_puts(const char *);
 void putc_hex(u32 val)
 {
 	int i;
@@ -40,10 +41,10 @@ void putc_hex(u32 val)
 		val >>= 4;
 	}
 	buf[8] = '\0';
-	puts(buf);
+	uart_puts(buf);
 }
 
-void putc(u8 c)
+void uart_putc(u8 c)
 {
 	int i, timeout = 1000;
 
@@ -55,13 +56,13 @@ void putc(u8 c)
 	}
 }
 
-void puts(const char * str)
+void uart_puts(const char * str)
 {
 	char c;
 
 	while((c = *str++) != '\0'){
-		putc(c);
+		uart_putc(c);
 		if(c == '\n')
-			putc('\r');
+			uart_putc('\r');
 	}
 }

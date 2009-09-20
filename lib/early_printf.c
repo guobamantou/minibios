@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include <types.h>
+#include <uart-driver.h>
 
 #define MAX_UART_PRINT_CHARS	128
 
@@ -23,5 +24,6 @@ int uart_printf(const char * fmt, va_list args)
 
 	print_len = parse_string(uart_print_buf, MAX_UART_PRINT_CHARS, fmt, args);
 
+	uart_puts(uart_print_buf);	
 	return print_len;
 }

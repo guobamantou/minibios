@@ -1,5 +1,8 @@
-libs-y := lib/early_printf.o lib/printf.o lib/string.o
+libs-y := $(src)/lib/early_printf.o $(src)/lib/printf.o $(src)/lib/string.o
 
-%.o: %.c lib/Makefile
+$(src)/lib/early_printf.o: $(src)/lib/early_printf.c $(src)/lib/Makefile
 	$(CC) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@	
-
+$(src)/lib/printf.o: $(src)/lib/printf.c $(src)/lib/Makefile
+	$(CC) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@	
+$(src)/lib/string.o: $(src)/lib/string.c $(src)/lib/Makefile
+	$(CC) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@	

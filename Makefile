@@ -37,15 +37,16 @@ minibios-lds  = board/loongson2f-yeeloong-8089/ld.script
 
 export src obj
 export MINIBIOSVERSION
+export head-y drivers-y libs-y
 all:	minibios Makefile
 include util/Makefile
 include init/Makefile
 include lib/Makefile
 include cpu/loongson2f/Makefile
+include drivers/Makefile
 
 
 PHONY += all
-minibios:  $(minibios-lds) 
 minibios:  $(minibios-head) $(minibios-main)
 	$(LD) $^ -o minibios -e _start -T $(minibios-lds)
 	$(OBJCOPY) -O binary minibios minibios.rom 
@@ -80,7 +81,7 @@ help:
 	@echo  "make bak"
 	@echo  "make ctags"
 bak:
-	tar czf /tmp/minibios.tar.gz *
+	tar czf /tmp/minibios.tar.gz .
 	cp /tmp/minibios.tar.gz /mnt/sda5/
 	scp /mnt/sda5/minibios.tar.gz software@172.16.0.30:xiangy
 .PHONY : $(PHONY)
