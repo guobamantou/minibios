@@ -20,15 +20,16 @@ static char *number(char *buf, char *end, unsigned long long num, int base , u32
  * parse_string 
  * size feild is means the maximum len of this output transaction
  */
-int parse_string(char str[], int size, const char * fmt, va_list args)
+int parse_string(char buf[], int size, const char * fmt, va_list args)
 {
 	char c;
-	char *end ,*output;
+	char *str, *end ,*output;
 	int base = 10;		// set default base to 10 
 	u32 flags = USINT;  // set default flag to unsigned long
 	unsigned long long num;
 	size_t len;
 
+	str = buf;
 	end = str + size;
 
 	for (; *fmt; fmt++) {
@@ -52,7 +53,7 @@ int parse_string(char str[], int size, const char * fmt, va_list args)
 			output = va_arg(args, char *);
 			len = strlen(output);
 			if(str + len < end) 
-				memcpy(output, str, len);
+				memcpy(str, output, len);
 			str += len;
 			continue;
 		case '%':
@@ -84,5 +85,5 @@ int parse_string(char str[], int size, const char * fmt, va_list args)
 		str = number(str, end, num, base, flags);
 	}	
 
-	return 1;
+	return str - buf;
 }

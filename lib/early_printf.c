@@ -24,6 +24,7 @@ int uart_printf(const char * fmt, va_list args)
 
 	print_len = parse_string(uart_print_buf, MAX_UART_PRINT_CHARS, fmt, args);
 
+	uart_print_buf[print_len] = '\0'; //mark end
 	uart_puts(uart_print_buf);	
 	return print_len;
 }
