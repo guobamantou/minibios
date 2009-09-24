@@ -7,7 +7,7 @@
 #include <loongson/addrspace.h>
 
 #define CONS_BAUD B115200
-u8* UART_BASE = PHY_TO_UNCACHED(UART_ADDR);
+u8* UART_BASE = (u8 *)PHY_TO_UNCACHED(UART_ADDR);
 
 void uart_out(u32 port, u8 c)
 {
