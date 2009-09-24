@@ -35,3 +35,14 @@ config LOONGSON2G_DEVBOARD
 	depends on LOONGSON2G
 endmenu
 
+menu "minibios type"
+choice 
+	prompt "code model"
+	default 32-BITS
+config 32BITS 
+	bool "32-bits"
+config 64BITS 
+	bool "64-bits"
+endchoice
+endmenu
+
