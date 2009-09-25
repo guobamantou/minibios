@@ -4,7 +4,6 @@
 
 #include <autoconf.h>
 #include <loongson/regdef.h>
-#include <loongson/addrspace.h>
 #include <loongson/prid.h>
 #include <uart.h>
 
@@ -25,6 +24,9 @@
 #endif
 
 #define OFFSET t9  /* t9 should not be used for other purpose */
+
+#define	PHY_TO_UNCACHED(p)	((p)|0xffffffffa0000000)
+#define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
 #define PRINTF(str) \
 	.rdata ;\

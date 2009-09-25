@@ -1,7 +1,7 @@
 /********  use t0, t1, t2 ,t3 ra ********/
 
 init_uart:
-	dli	t0, PHY_TO_UNCACHED(UART_ADDR)
+	li	t0, PHY_TO_UNCACHED(UART_ADDR)
 
 	/* set fifo mode */
 	li	t1, UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR |\
@@ -34,7 +34,7 @@ endof_init_uart:
 /********** use t0-t3, a0 ra **********/
 
 uart_putc: 
-	dli	t0,	PHY_TO_UNCACHED(UART_ADDR)	
+	li	t0,	PHY_TO_UNCACHED(UART_ADDR)	
 	
 	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
 retry:

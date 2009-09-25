@@ -1,20 +1,28 @@
 #include <stdio.h>
+#include <types.h>
+#include <io.h>
 
 void main(void)
 {
 	int i;
-	char test[10];
 
-	test[0] = '1';
-	test[1] = '1';
-	test[2] = '1';
-	test[3] = '\n';
-	test[4] = '\0';
-	early_printf("are you right? %% %s xixi\n","ni hao ma");
-	early_printf("are %x you %c righ%c t? \n", 1024, 'A', 'B');
-	early_printf("are you %s right? \n","shi bu shi\n");
-	early_printf("are%s you %d rig%i ht? \n", "no no ", 123, -890);
-	early_printf("are you %x right? \n",0x1234dfe);
+	early_printf("ready to erase chip\n");	
+	//sst_erase_chip();	
+	early_printf("return from erase chip\n");	
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
+}
+
+void sst_erase_chip()
+{
+	u32 flash_addr = 0xbfc00000;
+	
+	outb(flash_addr + 0x5555, 0xaa);
+	outb(flash_addr + 0x2aaa, 0x55);
+	outb(flash_addr + 0x5555, 0x80);
+	outb(flash_addr + 0x5555, 0xaa);
+	outb(flash_addr + 0x2aaa, 0x55);
+	outb(flash_addr + 0x5555, 0x10);
+	
+	return ;
 }
