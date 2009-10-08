@@ -2,6 +2,7 @@
 #include <device/flash.h>
 #include <device/flash_id.h>
 #include <io.h>
+#include <string.h>
 #include <stdio.h>
 #include <errno.h>
 
@@ -147,7 +148,6 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 		printf("start addr is 0x%x, end addr is 0x%x\n",start_addr, end_addr);	
 		while(dev->vaddr + offset <= end_addr){
 			dprintf("erase sector %d ...",(offset >> 12));	
-			dprintf("offset is %x\n",offset);
 			dev->ops->flash_erase_sector(dev,offset);	
 			dprintf(".");	
 			while(dev->ops->flash_erase_busy(dev, offset)){	
@@ -165,10 +165,10 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 #define SECTOR_SIZE 0x1000   // 4KB
 char tmp_buf[SECTOR_SIZE];
 
-
 /* program data_addr[0-data_size] to dev, starting addr's offset is flash_offset*/
 int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, int data_size)
 {
+	int ret;
 	int pre_size;	
 	ulong real_start_addr;
 	ulong start_addr = dev->vaddr + flash_offset;
@@ -181,6 +181,15 @@ int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, i
 		printf("out of memory!\n");
 		return -ENOMEM;
 	}
-	flash_erase(dev, real_start_addr, (start_addr + data_size -1));
+	/*save the pre data, clear the following data in tht sector*/
+	memcpy((void *)tmp_buf, (void *)real_start_addr, pre_size);
+	memcpy((void *)tmp_buf + pre_size, (void *)start_addr, data_size);
+
+	ret = flash_erase(dev, real_start_addr, (start_addr + data_size -1));
+	if(ret <= 0)
+		printf("erase failed, exit!");
+
+	memcpy((void *)real_start_addr, (void *)tmp_buf, pre_size + data_size);	
+	
 	return 0;
 }
