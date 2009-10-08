@@ -122,3 +122,16 @@ int parse_string(char buf[], int size, const char * fmt, va_list args)
 
 	return str - buf;
 }
+
+/*same to early_printf now*/
+int printf(const char *fmt, ...)
+{
+	va_list args;
+	int r;
+
+	va_start(args, fmt);
+	r = uart_printf(fmt, args);
+	va_end(args);
+
+	return r;
+}

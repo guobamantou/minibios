@@ -52,6 +52,7 @@ minibios:  $(minibios-head) $(minibios-main)
 	$(OBJCOPY) -O binary minibios minibios.rom 
 	cp minibios.rom /tftpboot
 	cp minibios /tftpboot
+	@du -sb minibios.rom
 PHONY += ctags
 ctags: clean
 	ctags -R

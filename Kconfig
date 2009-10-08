@@ -44,5 +44,17 @@ config 32BITS
 config 64BITS 
 	bool "64-bits"
 endchoice
+config DEBUG
+	bool "DEBUG"
 endmenu
+
+menu "Device"
+menu "Flash"
+config SST 
+	bool "SST"
+config MACRONIX
+	bool "MACRONIX"
+endmenu
+endmenu
+
 

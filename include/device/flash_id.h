@@ -1,3 +1,8 @@
+/* Manufacturers */
+#define MANUFACTURER_EON		0x001c
+#define MANUFACTURER_SST		0x00BF
+#define MANUFACTURER_MACRONIX	0x00C2
+
 /* SST */
 #define SST29EE020  0x0010
 #define SST29LE020  0x0012
@@ -29,4 +34,8 @@
 #define MX29F002T   0x00B0
 #define MX29F004T   0x0045
 #define MX29F004B   0x0046
+
+/* Eon */
+#define EN29SL800BB 0x226B
+#define EN29SL800BT 0x22EA
 
