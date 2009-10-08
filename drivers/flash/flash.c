@@ -16,8 +16,8 @@ void print_flash_device(struct flash_device *dev)
 		printf("flash name is %s\n", dev->name);
 		printf("manufact id is %x\n", dev->manufact_id);
 		printf("device id is %x\n", dev->device_id);
-		printf("sector size is %x KB\n", dev->sector_size * 4);
-		printf("flash size is %x KB\n", dev->size * 64);
+		printf("sector size is %d KB\n", dev->sector_size * 4);
+		printf("flash size is %d KB\n", dev->size * 64);
 		printf("flash vaddr is %x\n", dev->vaddr);
 	}
 }
@@ -29,9 +29,9 @@ void print_flash_device(struct flash_device *dev)
 int boot_flash_init(struct flash_device *dev)
 {
 #ifdef CONFIG_64BITS
-	dev->vaddr = (char *)0xffffffffbfc00000;
+	dev->vaddr = 0xffffffffbfc00000;
 #else
-	dev->vaddr = (char *)0xbfc00000;
+	dev->vaddr = 0xbfc00000;
 #endif
 	return flash_ident(dev);
 }
@@ -94,7 +94,7 @@ static inline ulong head_erase_align(struct flash_device *dev, ulong addr)
 
 static ulong tail_erase_align(struct flash_device *dev, ulong end_addr)
 {
-	return head_erase_align(dev, end_addr + (dev->sector_size << 12) -1); 
+	return head_erase_align(dev, end_addr + (dev->sector_size << 12)) -1; 
 }
 
 /* return 0 unless aligned */
@@ -109,8 +109,24 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 		start_addr = head_erase_align(dev, start_addr);
 	end_addr = tail_erase_align(dev, end_addr);	
 
+	if(start_addr < dev->vaddr) {
+		dprintf("start_addr < dev->vaddr\n");
+		return 0;
+	}
+	if(end_addr > (dev->vaddr + (dev->size << 16))){
+		dprintf("end_addr exceed\n");
+		return 0;
+	}
+	if(start_addr > end_addr){
+		dprintf("start_addr > end_addr\n");	
+		return 0;
+	}
+	if((dev == NULL) || (dev->ops == NULL)){
+		dprintf("dev or dev->ops is NULL");
+		return 0;
+	}
 	/*first check whether erase the whole chip*/
-	if(start_addr == (ulong)dev->vaddr){
+	if(start_addr == dev->vaddr){
 		if((end_addr + 1 - start_addr) == ((dev->size << 16))){
 			dprintf("starting erase chip ...");	
 			dev->ops->flash_erase_chip(dev);
@@ -125,12 +141,13 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 	}
 	/*erase some sectors, one by one*/
 	{	
-		ulong offset = 0; 
-		ulong sector_size = dev->sector_size >> 12;
+		ulong offset = start_addr - dev->vaddr; 
+		ulong sector_size = dev->sector_size << 12;
 
-		printf("start addr is %x, end addr is %x\n",start_addr, end_addr);	
-		while(start_addr + offset <= end_addr){
+		printf("start addr is 0x%x, end addr is 0x%x\n",start_addr, end_addr);	
+		while(dev->vaddr + offset <= end_addr){
 			dprintf("erase sector %d ...",(offset >> 12));	
+			dprintf("offset is %x\n",offset);
 			dev->ops->flash_erase_sector(dev,offset);	
 			dprintf(".");	
 			while(dev->ops->flash_erase_busy(dev, offset)){	
@@ -140,7 +157,7 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 			offset += sector_size;
 			dprintf("\n");	
 		}
-		dprintf("erase done1\n");	
+		dprintf("erase done!\n");	
 		return 1;
 	}
 }
@@ -154,7 +171,7 @@ int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, i
 {
 	int pre_size;	
 	ulong real_start_addr;
-	ulong start_addr = (ulong)dev->vaddr + flash_offset;
+	ulong start_addr = dev->vaddr + flash_offset;
 	
 	real_start_addr = head_erase_align(dev, start_addr);  	
 	pre_size = start_addr - real_start_addr;
@@ -164,6 +181,6 @@ int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, i
 		printf("out of memory!\n");
 		return -ENOMEM;
 	}
-	flash_erase(dev, real_start_addr, (start_addr + data_size));
+	flash_erase(dev, real_start_addr, (start_addr + data_size -1));
 	return 0;
 }

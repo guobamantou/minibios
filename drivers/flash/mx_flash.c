@@ -29,7 +29,7 @@ int sst_program_busy(struct flash_device *dev, u32 offset)
 #endif 
 void mx_erase_sector(struct flash_device *dev, u32 offset)
 {
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 	
 	outb(flash_addr + 0x555, 0xaa);
 	outb(flash_addr + 0x2aa, 0x55);
@@ -41,7 +41,7 @@ void mx_erase_sector(struct flash_device *dev, u32 offset)
 
 void mx_erase_chip(struct flash_device *dev)
 {
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 	
 	outb(flash_addr + 0x555, 0xaa);
 	outb(flash_addr + 0x2aa, 0x55);

@@ -5,19 +5,19 @@
 int sst_erase_busy(struct flash_device *dev, u32 offset)
 {
 	u8 poll;
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 
 	poll = inb(flash_addr + offset);	
 	if(poll & 0x80) // see sst flash datasheet Data# Polling (DQ7) 
-		return 1;
-	return 0;	
+		return 0;
+	return 1;	
 }
 
 /* return non-zero means busy*/
 int sst_program_busy(struct flash_device *dev, u32 offset)
 {
 	u8 poll1, poll2;
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 
 	poll1 = inb(flash_addr + offset);	
 	poll2 = inb(flash_addr + offset);	
@@ -28,7 +28,7 @@ int sst_program_busy(struct flash_device *dev, u32 offset)
 
 void sst_erase_sector(struct flash_device *dev, u32 offset)
 {
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 	
 	outb(flash_addr + 0x5555, 0xaa);
 	outb(flash_addr + 0x2aaa, 0x55);
@@ -40,7 +40,7 @@ void sst_erase_sector(struct flash_device *dev, u32 offset)
 
 void sst_erase_chip(struct flash_device *dev)
 {
-	char* flash_addr = dev->vaddr;
+	ulong flash_addr = dev->vaddr;
 	
 	outb(flash_addr + 0x5555, 0xaa);
 	outb(flash_addr + 0x2aaa, 0x55);

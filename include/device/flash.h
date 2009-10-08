@@ -3,7 +3,7 @@
 struct flash_ops;
 typedef struct flash_device {
 	char *name;
-	char *vaddr;
+	ulong vaddr;
 	u8	manufact_id;
 	u8	device_id;
 	u8	size;        // unit 64KB
