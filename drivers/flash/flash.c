@@ -138,10 +138,9 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 	/*first check whether erase the whole chip*/
 	if(start_addr == dev->vaddr){
 		if((end_addr + 1 - start_addr) == ((dev->size << 16))){
-			dprintf("starting erase chip    ");	
+			dprintf("starting erase chip ... ");	
 			dev->ops->flash_erase_chip(dev);
 			while(dev->ops->flash_erase_busy(dev, 0)){
-				poll_output(10);	
 				//udelay(10);
 			}
 			dprintf("\n");	
@@ -156,10 +155,9 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 
 		printf("start addr is 0x%x, end addr is 0x%x\n",start_addr, end_addr);	
 		while(dev->vaddr + offset <= end_addr){
-			dprintf("erase sector %d   ",(offset >> 12));	
+			dprintf("erase sector %d   ...",(offset >> 12));	
 			dev->ops->flash_erase_sector(dev,offset);	
 			while(dev->ops->flash_erase_busy(dev, offset)){	
-				poll_output(10);
 				//udelay(10);
 			}
 			offset += sector_size;
@@ -175,10 +173,6 @@ int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, ch
 	int i;
 	u8 *p = data_addr;
 
-	if(erase_not_aligned(dev, start_addr))		
-		start_addr = head_erase_align(dev, start_addr);
-	end_addr = tail_erase_align(dev, end_addr);	
-
 	if(!param_check(dev, start_addr, end_addr))
 		return 0;
 	
@@ -193,15 +187,16 @@ int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, ch
 	start_addr -= dev->vaddr;
 
 	{
-		dprintf("starting program flash ...");	
+		dprintf("starting program flash ...\n");	
+		dprintf("start addr is %x, end addr is %x\n",start_addr, end_addr);	
 		for(i = start_addr; i <= end_addr; i++){
 			dev->ops->flash_program(dev, i, *p++);	
-			dprintf(".");	
 			while(dev->ops->flash_program_busy(dev, i)){
+				poll_output(100);	
 				//udelay(10);
 			}
 		}
-		dprintf("program done!\n.");	
+		dprintf("program done!\n");	
 		return 1;
 	}
 	return 0;
@@ -228,7 +223,7 @@ int flash_write(struct flash_device *dev, u32 flash_offset, char *data_addr, siz
 	}
 	/*save the pre data, clear the following data in tht sector*/
 	memcpy((void *)tmp_buf, (void *)real_start_addr, pre_size);
-	memcpy((void *)tmp_buf + pre_size, (void *)start_addr, data_size);
+	memcpy((void *)tmp_buf + pre_size, (void *)data_addr, data_size);
 
 	ret = flash_erase(dev, real_start_addr, (start_addr + data_size -1));
 	if(ret <= 0){

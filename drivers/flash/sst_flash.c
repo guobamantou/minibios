@@ -32,7 +32,7 @@ void sst_flash_program(struct flash_device *dev, u32 offset, u8 val)
 	
 	outb(flash_addr + 0x5555, 0xaa);
 	outb(flash_addr + 0x2aaa, 0x55);
-	outb(flash_addr + 0x5555, 0xaa);
+	outb(flash_addr + 0x5555, 0xa0);
 	outb(flash_addr + offset, val);
 }
 
