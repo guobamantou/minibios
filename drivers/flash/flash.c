@@ -63,6 +63,7 @@ int flash_ident(struct flash_device *dev)
 		dev->sector_size = 1; // unit is 4KB
 		dev->size = 8; // unit is 64KB
 		dev->name = "sst"; 
+		dev->type = 8;
 		dev->ops = &sst_flash_ops;
 		return 1;		
 	}
@@ -80,6 +81,7 @@ int flash_ident(struct flash_device *dev)
 		dev->sector_size = 16; // unit is KB
 		dev->size = 8;  // unit is 64KB
 		dev->name = "mx"; 
+		dev->type = 8;
 		dev->ops = &mx_flash_ops;
 		return 1;		
 	}
@@ -104,12 +106,8 @@ static inline int erase_not_aligned(struct flash_device *dev, ulong addr)
 	return (addr & ((dev->sector_size << 12) - 1)); 
 }
 
-int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
+static int param_check(struct flash_device *dev, ulong start_addr, ulong end_addr)
 {
-	if(erase_not_aligned(dev, start_addr))		
-		start_addr = head_erase_align(dev, start_addr);
-	end_addr = tail_erase_align(dev, end_addr);	
-
 	if(start_addr < dev->vaddr) {
 		dprintf("start_addr < dev->vaddr\n");
 		return 0;
@@ -126,17 +124,28 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 		dprintf("dev or dev->ops is NULL");
 		return 0;
 	}
+	return 1;
+}
+
+int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
+{
+	if(erase_not_aligned(dev, start_addr))		
+		start_addr = head_erase_align(dev, start_addr);
+	end_addr = tail_erase_align(dev, end_addr);	
+
+	if(!param_check(dev, start_addr, end_addr))
+		return 0;
 	/*first check whether erase the whole chip*/
 	if(start_addr == dev->vaddr){
 		if((end_addr + 1 - start_addr) == ((dev->size << 16))){
-			dprintf("starting erase chip ...");	
+			dprintf("starting erase chip    ");	
 			dev->ops->flash_erase_chip(dev);
-			dprintf(".");	
 			while(dev->ops->flash_erase_busy(dev, 0)){
-				dprintf(".");	
+				poll_output(10);	
 				//udelay(10);
 			}
 			dprintf("\n");	
+			dprintf("erase done!\n");	
 			return 1;
 		}
 	}
@@ -147,11 +156,10 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 
 		printf("start addr is 0x%x, end addr is 0x%x\n",start_addr, end_addr);	
 		while(dev->vaddr + offset <= end_addr){
-			dprintf("erase sector %d ...",(offset >> 12));	
+			dprintf("erase sector %d   ",(offset >> 12));	
 			dev->ops->flash_erase_sector(dev,offset);	
-			dprintf(".");	
 			while(dev->ops->flash_erase_busy(dev, offset)){	
-				dprintf(".");	
+				poll_output(10);
 				//udelay(10);
 			}
 			offset += sector_size;
@@ -162,14 +170,51 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 	}
 }
 
+int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, char *data_addr)
+{
+	int i;
+	u8 *p = data_addr;
+
+	if(erase_not_aligned(dev, start_addr))		
+		start_addr = head_erase_align(dev, start_addr);
+	end_addr = tail_erase_align(dev, end_addr);	
+
+	if(!param_check(dev, start_addr, end_addr))
+		return 0;
+	
+	/*we always use 8-bits flash till now, if new flash use 16/24-bits,change here*/
+
+	if(dev->type != 8){
+		dprintf("not support 16/24-bits flash now!\n");
+		return 0;
+	}
+
+	end_addr -= dev->vaddr;	
+	start_addr -= dev->vaddr;
+
+	{
+		dprintf("starting program flash ...");	
+		for(i = start_addr; i <= end_addr; i++){
+			dev->ops->flash_program(dev, i, *p++);	
+			dprintf(".");	
+			while(dev->ops->flash_program_busy(dev, i)){
+				//udelay(10);
+			}
+		}
+		dprintf("program done!\n.");	
+		return 1;
+	}
+	return 0;
+}
+
 #define SECTOR_SIZE 0x1000   // 4KB
 char tmp_buf[SECTOR_SIZE];
 
 /* program data_addr[0-data_size] to dev, starting addr's offset is flash_offset*/
-int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, int data_size)
+int flash_write(struct flash_device *dev, u32 flash_offset, char *data_addr, size_t data_size)
 {
 	int ret;
-	int pre_size;	
+	size_t pre_size;	
 	ulong real_start_addr;
 	ulong start_addr = dev->vaddr + flash_offset;
 	
@@ -186,10 +231,10 @@ int flash_program(struct flash_device *dev, u32 flash_offset, char *data_addr, i
 	memcpy((void *)tmp_buf + pre_size, (void *)start_addr, data_size);
 
 	ret = flash_erase(dev, real_start_addr, (start_addr + data_size -1));
-	if(ret <= 0)
+	if(ret <= 0){
 		printf("erase failed, exit!");
-
-	memcpy((void *)real_start_addr, (void *)tmp_buf, pre_size + data_size);	
-	
+		return 0;
+	}
+	flash_program(dev, real_start_addr, (start_addr + data_size -1), tmp_buf);	
 	return 0;
 }

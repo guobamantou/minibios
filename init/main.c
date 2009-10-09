@@ -15,9 +15,11 @@ void main(void)
 		early_printf("error\n");
 	else 
 		print_flash_device(&flash_dev);	
-	flash_erase(&flash_dev, 0xbfc00000 + 0x3000, 0xbfc00000 + 0x9fff);
+	while(1)
+		poll_output(1000000);
+	//flash_erase(&flash_dev, 0xbfc00000 + 0x3000, 0xbfc00000 + 0x9fff);
 
-	flash_erase(&flash_dev, 0xbfc00000 + 0x10000, 0xbfc00000 + 0x5ffff);
+	//flash_erase(&flash_dev, 0xbfc00000 + 0x10000, 0xbfc00000 + 0x5ffff);
 
 
 	while(1);

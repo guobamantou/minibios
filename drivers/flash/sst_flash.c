@@ -26,6 +26,16 @@ int sst_program_busy(struct flash_device *dev, u32 offset)
 	return 0;
 }
 
+void sst_flash_program(struct flash_device *dev, u32 offset, u8 val)
+{
+	ulong flash_addr = dev->vaddr;
+	
+	outb(flash_addr + 0x5555, 0xaa);
+	outb(flash_addr + 0x2aaa, 0x55);
+	outb(flash_addr + 0x5555, 0xaa);
+	outb(flash_addr + offset, val);
+}
+
 void sst_erase_sector(struct flash_device *dev, u32 offset)
 {
 	ulong flash_addr = dev->vaddr;
@@ -55,5 +65,6 @@ struct flash_ops sst_flash_ops = {
 	.flash_erase_sector = sst_erase_sector,
 	.flash_erase_busy	= sst_erase_busy,
 	.flash_program_busy = sst_program_busy,
+	.flash_program		= sst_flash_program,
 };
 
