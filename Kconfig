@@ -38,15 +38,25 @@ endmenu
 menu "minibios type"
 choice 
 	prompt "code model"
-	default 32-BITS
+	default 3BITS
 config 32BITS 
 	bool "32-bits"
 config 64BITS 
 	bool "64-bits"
 endchoice
+config DYMATIC_CPUFREQ
+	bool "dymatic cpu freq detect"
+config STATIC_CPUFREQ
+	int "static cpu freq"
+	depends on !DYMATIC_CPUFREQ 
+	default 800000000 if LOONGSON2F
+	default 660000000 if LOONGSON2E
+	default 900000000 if LOONGSON2G
 config DEBUG
 	bool "DEBUG"
+
 endmenu
+
 
 menu "Device"
 menu "Flash"

@@ -5,10 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-
-#ifdef CONFIG_DEBUG
 #include <debug.h>
-#endif
 
 #ifdef CONFIG_DEBUG
 void print_flash_device(struct flash_device *dev)
@@ -27,6 +24,7 @@ void print_flash_device(struct flash_device *dev)
 {
 }
 #endif
+
 int boot_flash_init(struct flash_device *dev)
 {
 #ifdef CONFIG_64BITS
