@@ -43,6 +43,7 @@ include util/Makefile
 include init/Makefile
 include lib/Makefile
 include cpu/loongson2f/Makefile
+include cpu/Makefile
 include drivers/Makefile
 
 
