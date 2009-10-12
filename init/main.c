@@ -18,9 +18,7 @@ void main(void)
 	i = boot_flash_init(&flash_dev);
 	if(i == 0)
 		early_printf("error\n");
-	flash_write(&flash_dev, 0x4000, str, 0x1000);
-	flash_write(&flash_dev, 0x4004, str, 0x1000);
-
+	init_cpu_freq();
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
 }

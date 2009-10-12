@@ -196,7 +196,6 @@ detect_cs5536:
 2:	
 	PRINTF("start.S done\r\n");
 
-	.set reorder
 	la	v0, main
 	jalr	v0
 	nop
@@ -218,3 +217,4 @@ detect_cs5536:
 
 #include "uart.S"
 
+.set reorder

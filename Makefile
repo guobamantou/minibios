@@ -73,6 +73,8 @@ clean:
 	rm -rf $(src)/init/start.s
 	rm -rf $(src)/minibios
 	rm -rf $(src)/minibios.rom
+	rm -rf /tftpboot/minibios.rom
+	rm -rf /tftpboot/minibios
 PHONY += help 
 help:
 	@echo  "make "
