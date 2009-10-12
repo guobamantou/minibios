@@ -15,7 +15,7 @@ void main(void)
 		early_printf("error\n");
 	init_cpu_freq();
 	early_printf("begin delay 60s\n");
-	delay(60 * 1000);	
+	udelay(100 * 1000);	
 	early_printf("delay 60s end\n");
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
