@@ -2,8 +2,7 @@
 #include <device/flash.h>
 
 extern int boot_flash_init(struct flash_device *);
-extern void print_flash_device(struct flash_device *);
-
+extern int init_cs5536_rtc();
 void main(void)
 {
 	int i;
@@ -14,9 +13,8 @@ void main(void)
 	if(i == 0)
 		early_printf("error\n");
 	init_cpu_freq();
-	early_printf("begin delay 60s\n");
-	udelay(100 * 1000);	
-	early_printf("delay 60s end\n");
+	init_cs5536_rtc();
+	early_printf("fdsa \n");
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
 }

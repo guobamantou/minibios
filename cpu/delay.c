@@ -23,10 +23,6 @@ void init_cpu_freq()
 	cycle_per_ms = 0x80000000 / ms_overflow;  // to avoid overflow
 	cycle_per_ms = cycle_per_ms *2 + 2; // cycle_per_ms is bigger than the actual number
 	cycle_per_us = cycle_per_ms / 1000 + 1;
-	dprintf("cpu freq is %d MHz\n", cpu_freq);
-	dprintf("ms_overflow is %d\n", ms_overflow);
-	dprintf("cycle_per_ms is %d\n", cycle_per_ms);
-	dprintf("cycle_per_us is %d\n", cycle_per_us);
 	cpu_freq_inited = 1;
 }
 

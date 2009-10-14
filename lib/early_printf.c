@@ -4,9 +4,22 @@
 
 #define MAX_UART_PRINT_CHARS	128
 
-static char uart_print_buf[MAX_UART_PRINT_CHARS];
+char uart_print_buf[MAX_UART_PRINT_CHARS];
 
 int early_printf(const char *fmt, ...)
+{
+	va_list args;
+	int r;
+
+	va_start(args, fmt);
+	r = uart_printf(fmt, args);
+	va_end(args);
+
+	return r;
+}
+
+/*same to early_printf now*/
+int printf(const char *fmt, ...)
 {
 	va_list args;
 	int r;

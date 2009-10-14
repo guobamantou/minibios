@@ -15,8 +15,7 @@ OBJCOPY = $(CROSS_COMPILE)objcopy
 CFLAGS = -Os -Wall -Wstrict-prototypes -Wno-trigraphs \
 		-Werror-implicit-function-declaration -Wstrict-aliasing \
 		-fno-common -ffreestanding -fno-builtin \
-		-mpreferred-stack-boundary=2 -pipe
-
+		-pipe -nostdlib 
 HOSTCC		= cc
 HOSTCXX		= g++
 HOSTCFLAGS	= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
