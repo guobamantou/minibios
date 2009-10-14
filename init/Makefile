@@ -3,9 +3,9 @@ head-y := init/start.o
 core-y := init/main.o
 
 init/start.o: $(asm_file)
-	$(CC) -E init/start.S -mno-abicalls -I $(MINIBIOSINCLUDE) -o init/start.s
+	$(CC) $(CFLAGS)-E init/start.S -mno-abicalls -I $(MINIBIOSINCLUDE) -o init/start.s
 	$(AS) -o init/start.o init/start.s
 init/main.o:init/main.c 
-	$(CC) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
+	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
 
 

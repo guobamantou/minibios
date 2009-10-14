@@ -37,11 +37,13 @@ static char *number(char *buf, char *end, unsigned long long num, u32 flags)
 		/* this will have problem when long is 64 bits */
 		do {
 			tmp[i++] = digits[(u32)num % 10];
-		} while(num = ((u32)num / 10));	
+			num = (u32)num / 10;
+		} while(num );	
 	} else if(flags & BASE16) {
 		do {
 			tmp[i++] = digits[num & 0xf];
-		} while(num = (num >> 4));		
+			num = num >> 4;
+		} while(num);		
 	}
 	
 	if (buf + i < end) {

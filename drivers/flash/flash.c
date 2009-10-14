@@ -25,16 +25,6 @@ void print_flash_device(struct flash_device *dev)
 }
 #endif
 
-int boot_flash_init(struct flash_device *dev)
-{
-#ifdef CONFIG_64BITS
-	dev->vaddr = 0xffffffffbfc00000;
-#else
-	dev->vaddr = 0xbfc00000;
-#endif
-	return flash_ident(dev);
-}
-
 #ifdef CONFIG_SST
 extern struct flash_ops sst_flash_ops;
 #endif
@@ -86,6 +76,16 @@ int flash_ident(struct flash_device *dev)
 #endif
 
 	return 0;
+}
+
+int boot_flash_init(struct flash_device *dev)
+{
+#ifdef CONFIG_64BITS
+	dev->vaddr = 0xffffffffbfc00000;
+#else
+	dev->vaddr = 0xbfc00000;
+#endif
+	return flash_ident(dev);
 }
 
 static inline ulong head_erase_align(struct flash_device *dev, ulong addr)
@@ -166,7 +166,9 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 	}
 }
 
-int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, char *data_addr)
+extern void poll_output(int);
+
+int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, u8 *data_addr)
 {
 	int i;
 	u8 *p = data_addr;
@@ -201,7 +203,7 @@ int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, ch
 }
 
 #define SECTOR_SIZE 0x1000   // 4KB
-char tmp_buf[SECTOR_SIZE];
+u8 tmp_buf[SECTOR_SIZE];
 
 /* program data_addr[0-data_size] to dev, starting addr's offset is flash_offset*/
 int flash_write(struct flash_device *dev, u32 flash_offset, char *data_addr, size_t data_size)

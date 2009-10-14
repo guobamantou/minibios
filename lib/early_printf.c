@@ -6,6 +6,19 @@
 
 char uart_print_buf[MAX_UART_PRINT_CHARS];
 
+extern int parse_string(char buf[], int, const char *, va_list);
+
+int uart_printf(const char * fmt, va_list args)
+{
+	int print_len;		
+
+	print_len = parse_string(uart_print_buf, MAX_UART_PRINT_CHARS, fmt, args);
+
+	uart_print_buf[print_len] = '\0'; //mark end
+	uart_puts(uart_print_buf);	
+	return print_len;
+}
+
 int early_printf(const char *fmt, ...)
 {
 	va_list args;
@@ -31,13 +44,4 @@ int printf(const char *fmt, ...)
 	return r;
 }
 
-int uart_printf(const char * fmt, va_list args)
-{
-	int print_len;		
 
-	print_len = parse_string(uart_print_buf, MAX_UART_PRINT_CHARS, fmt, args);
-
-	uart_print_buf[print_len] = '\0'; //mark end
-	uart_puts(uart_print_buf);	
-	return print_len;
-}

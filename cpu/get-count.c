@@ -10,4 +10,5 @@ u32 get_count()
 #endif
 		".set reorder\n"
 	); 
+	/* in fact, this function return value direct by v0 regsiter*/	
 }

@@ -36,7 +36,8 @@ int set_date(u8 year, u8 month, u8 day, u8 hour, u8 min, u8 sec)
 	return 0;
 
 }
-int init_cs5536_rtc()
+
+int init_cs5536_rtc(void)
 {
 	u8 year, month, day, hour, min, sec;
 #if 0	
@@ -63,5 +64,6 @@ int init_cs5536_rtc()
 		return 0;
     }
 
+	printf("year is %d\n", year);
 	return 1;
 }

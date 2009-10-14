@@ -1,6 +1,7 @@
 #include <types.h>
 #include <panic.h>
 #include <debug.h>
+#include <stdio.h>
 #include <autoconf.h>
 
 u32 cpu_freq; // unit: MHz
@@ -8,7 +9,7 @@ u32 ms_overflow;
 u32 cycle_per_ms, cycle_per_us;
 int cpu_freq_inited = 0;
 
-void init_cpu_freq()
+void init_cpu_freq(void)
 {
 #ifdef CONFIG_STATIC_CPUFREQ
 	cpu_freq = CONFIG_STATIC_CPUFREQ;
@@ -26,6 +27,7 @@ void init_cpu_freq()
 	cpu_freq_inited = 1;
 }
 
+extern u32 get_count(void);
 void delay(u32 ms)
 {
 	int overflow_times;

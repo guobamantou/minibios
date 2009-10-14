@@ -30,11 +30,11 @@ void init_uart(void)
 	uart_out(UART_IER, 0);
 }
 
-void uart_puts(const char *);
+void uart_puts(const u8 *);
 void putc_hex(u32 val)
 {
 	int i;
-	unsigned char buf[9];
+	u8 buf[9];
 
 	for(i = 7; i >= 0; i--) {
 		buf[i] = "0123456789ABCDEF"[val & 0x0F];
@@ -46,7 +46,7 @@ void putc_hex(u32 val)
 
 void uart_putc(u8 c)
 {
-	int i, timeout = 1000;
+	int timeout = 1000;
 
 	while(timeout-- > 0) {
 		if (uart_in(UART_LSR) & UART_LSR_THRE) {
@@ -56,9 +56,9 @@ void uart_putc(u8 c)
 	}
 }
 
-void uart_puts(const char * str)
+void uart_puts(const u8 * str)
 {
-	char c;
+	u8 c;
 
 	while((c = *str++) != '\0'){
 		uart_putc(c);
