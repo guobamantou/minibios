@@ -55,7 +55,7 @@ minibios:  $(minibios-head) $(minibios-main)
 	@du -sb minibios.rom
 PHONY += ctags
 ctags: clean
-	ctags -R
+	ctags -R --exclude="util"
 PHONY += prepare
 prepare:
 	@rm -rf $(obj)

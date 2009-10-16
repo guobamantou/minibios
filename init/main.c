@@ -6,12 +6,9 @@
 extern int boot_flash_init(struct flash_device *);
 extern int init_cs5536_rtc(void);
 extern void init_cpu_freq(void);
-int set_date(u8 year, u8 month, u8 day, u8 hour, u8 min, u8 sec);
-int week_day(u8 year, u8 month, u8 day);
 
-extern void rdmsr(u32, u32*, u32*);
-extern void wrmsr(u32, u32, u32);
-
+extern u32 detect_cpu_freq(void);
+extern void init_mfgpt0(void);
 void main(void)
 {
 	int i;
@@ -23,12 +20,8 @@ void main(void)
 	if(i == 0)
 		early_printf("error\n");
 	init_cpu_freq();
-	init_cs5536_rtc();
-	rdmsr(0x80000000, &hi, &lo);
-	printf("lo is %x, hi is %x\n", lo, hi);
-	wrmsr(0x8000000d, 0, 0x1234);
-	rdmsr(0x8000000d, &hi, &lo);
-	printf("hi is %x, hi is %x\n", lo, hi);
+	init_mfgpt0();
+
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
 }

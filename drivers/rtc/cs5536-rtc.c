@@ -60,7 +60,7 @@ int set_date(u8 year, u8 month, u8 day, u8 hour, u8 min, u8 sec)
 	return 0;
 }
 
-/* the function name may be not suitable*/
+/* the function name may be not suitable, rtc not need any initial normally*/
 int init_cs5536_rtc(void)
 {
 	u8 year, month, day, hour, min, sec;

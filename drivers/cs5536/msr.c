@@ -45,5 +45,4 @@ void wrmsr(u32 msr, u32 hi, u32 lo)
 	*(volatile u32 *)(PHY_TO_UNCACHED(NB_PCICMD)) |= 0x28000000;
 	*(volatile u32 *)(PHY_TO_UNCACHED(PCIMAP_CFG)) = (MSR_DATA1 >> 16) | type;
 	*(volatile u32 *)((PHY_TO_UNCACHED(PCICFG_SPACE)) | (MSR_DATA1 & 0xfffc)) = hi; 
-
 }
