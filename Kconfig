@@ -47,11 +47,11 @@ endchoice
 config DYMATIC_CPUFREQ
 	bool "dymatic cpu freq detect"
 config STATIC_CPUFREQ
-	int "static cpu freq"
+	int "(MHz) static cpu freq"
 	depends on !DYMATIC_CPUFREQ 
-	default 800000000 if LOONGSON2F
-	default 660000000 if LOONGSON2E
-	default 900000000 if LOONGSON2G
+	default 800 if LOONGSON2F
+	default 660 if LOONGSON2E
+	default 900 if LOONGSON2G
 config DEBUG
 	bool "DEBUG"
 
@@ -65,6 +65,12 @@ config SST
 config MACRONIX
 	bool "MACRONIX"
 endmenu
+menu "South Bridge"
+config CS5536 
+	bool "AMD cs5536"
+	default y if LOONGSON2F_FULOONG || LOONGSON2F_YEELOONG
+endmenu
+
 endmenu
 
 

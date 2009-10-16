@@ -1,4 +1,5 @@
 #include <io.h>
+#include <time.h>
 #include <types.h>
 #include <stdio.h>
 #include <device/rtc.h>
@@ -19,24 +20,47 @@ u8 cmos_read(u8 addr)
 	return io_inb(RTC_DATA_PORT);
 }
 
+u8 week_day(u8 year, u8 month, u8 day)
+{
+	/* 2000-1-1 is Saturday*/	
+	int days = 0;
+	int i;
+
+	if(year)
+		days = (year * 365) + ((year + 3) / 4);
+	if(!(year % 4))
+		month_day[1] = 29; 
+	for(i = 1; i < month; i++)
+		days += month_day[i-1];
+	days += day; // add one day more
+	return ((days + 5) % 7);
+}
+
+/*in minibios, I limits year from 2000-2099*/
 int set_date(u8 year, u8 month, u8 day, u8 hour, u8 min, u8 sec)
 {
 	if((year > 99) || (month > 12) || (day > 31) || 
-		(hour > 23) || (min > 59) || (sec > 59)){
-		printf("invalid date format ");
+	   (hour > 23) || (min > 59) || (sec > 59)){
+		printf("invalid date format\n");
 		return -1;	
    	} 
+
+	if((year % 4) && (month == 2) && (day == 29)){
+		printf("invalid date format\n");
+		return -1;	
+   	} 
+
 	cmos_write(RTC_YEAR , year);
     cmos_write(RTC_MONTH, month);
     cmos_write(RTC_DAY  , day);
     cmos_write(RTC_HOUR , hour);
     cmos_write(RTC_MIN  , min);
     cmos_write(RTC_SEC  , sec);
-   	
+	cmos_write(RTC_WEEK , week_day(year, month, day));   	
 	return 0;
-
 }
 
+/* the function name may be not suitable*/
 int init_cs5536_rtc(void)
 {
 	u8 year, month, day, hour, min, sec;
@@ -61,9 +85,9 @@ int init_cs5536_rtc(void)
         cmos_write(RTC_HOUR , 8);
         cmos_write(RTC_MIN  , 8);
         cmos_write(RTC_SEC  , 8);
+		cmos_write(RTC_WEEK , 5); // 2008-8-8 is Friday
 		return 0;
     }
 
-	printf("year is %d\n", year);
 	return 1;
 }

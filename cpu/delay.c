@@ -14,11 +14,12 @@ void init_cpu_freq(void)
 #ifdef CONFIG_STATIC_CPUFREQ
 	cpu_freq = CONFIG_STATIC_CPUFREQ;
 #else 
-	cpu_freq = detect_cpu_freq(); // loongson's cpu frequence will not reach 4G in 5 years
+	extern u32 detect_cpu_freq(void);
+	cpu_freq = detect_cpu_freq(); 
 #endif
-	if(cpu_freq < 1000000)
-		panic("too low cpu freq: less than 1 MHz");	
-	cpu_freq = cpu_freq / 1000000; // unit: MHz
+	if(cpu_freq < 100)
+		panic("too low cpu freq: less than 100 MHz");	
+
 	/* ms_overflow = (2 * 2^32 / cpu freq (unit: HZ) * 1000) */
  	ms_overflow = ((8 * 1073 * 1000) / cpu_freq); // 2^30 = 1073741824, ms_overflow should less than the actual number
 	cycle_per_ms = 0x80000000 / ms_overflow;  // to avoid overflow
