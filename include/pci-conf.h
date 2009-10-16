@@ -1,4 +1,5 @@
 #include <types.h>
+#include <pci.h>
 
 #define PCI_BUS(A)		((A) >> 16)
 #define PCI_SLOT(A)     (((A) >> 11) & 0x1f)

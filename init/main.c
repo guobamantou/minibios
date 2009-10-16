@@ -21,12 +21,11 @@ void main(void)
 	init_cpu_freq();
 	init_cs5536_rtc();
 	cs5536_dev = MAKE_PCI_DEV(0, 9, 0);
-	printf("reg 0 is %x\n", pci_conf_read32(cs5536_dev, 0));
-	cs5536_dev = MAKE_PCI_DEV(0, 8, 0);
-	printf("reg 0 is %x\n", pci_conf_read32(cs5536_dev, 0));
-	cs5536_dev = MAKE_PCI_DEV(0, 9, 0);
-	printf("reg 0 is %x\n", pci_conf_read8(cs5536_dev, 0));
-	printf("reg 3 is %x\n", pci_conf_read8(cs5536_dev, 3));
+	printf("reg 0x10 is %x\n", pci_conf_read32(cs5536_dev, 0x10));
+	pci_conf_write32(cs5536_dev, 0x10, 0x12340000);
+	printf("reg 0x10 is %x\n", pci_conf_read32(cs5536_dev, 0x10));
+	pci_conf_write8(cs5536_dev, 0x12, 0x78);
+	printf("reg 0x10 is %x\n", pci_conf_read32(cs5536_dev, 0x10));
 
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");

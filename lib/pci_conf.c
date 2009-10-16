@@ -41,10 +41,11 @@ static u32 pci_conf_read(pci_reg pcitag, u32 reg, size_t size)
 		type = 0x10000;
 	}		
 
+	printf("addr is %x\n", addr);
 	*(volatile u32 *)(PHY_TO_UNCACHED(NB_PCICMD)) |= 0x28000000;
-	*(volatile u32 *)PHY_TO_UNCACHED(PCIMAP_CFG) = (addr >> 16) | type;
+	*(volatile u32 *)(PHY_TO_UNCACHED(PCIMAP_CFG)) = (addr >> 16) | type;
 
-	val = *(volatile u32 *)(PHY_TO_UNCACHED(PCICFG_SPACE)) | (addr & 0xfffc);	
+	val = *(volatile u32 *)(PHY_TO_UNCACHED(PCICFG_SPACE) | (addr & 0xfffc));	
 	
 	if(size == 4) {
 		return val;
@@ -120,8 +121,9 @@ static void pci_conf_write(pci_reg pcitag, u32 reg, size_t size, u32 val)
 
 	if (size == 1){
 		shift = (reg & 3) * 8;		
-		val = old_val & ~(0xff << shift);	
-		val |= val | ((u8)val << shift);
+		old_val = old_val & ~(0xff << shift);	
+		val = old_val | ((u8)val << shift);
+		printf("val is %x\n", val);
 	} else if (size == 2){ //caller will ensure reg align is ok
 		if(reg & 2)
 			val = (old_val & 0xffff) | ((u16)val << 16);
