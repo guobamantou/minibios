@@ -15,7 +15,7 @@ void init_cpu_freq(void)
 	cpu_freq = CONFIG_STATIC_CPUFREQ;
 #else 
 	extern u32 detect_cpu_freq(void);
-	cpu_freq = detect_cpu_freq(); 
+	detect_cpu_freq(); 
 #endif
 	if(cpu_freq < 100)
 		panic("too low cpu freq: less than 100 MHz");	
