@@ -15,6 +15,7 @@ void main(void)
 	i = boot_flash_init(&flash_dev);
 	if(i == 0)
 		early_printf("error\n");
+	
 	init_cpu_freq();
 
 	printf("cpu freq is %d\n", cpu_freq);
