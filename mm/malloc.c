@@ -30,7 +30,7 @@ ulong cur_addr;		// current addr avilable for allocate
 static void list_add(struct mem_list *, struct mem_list *);
 static void list_del(struct mem_list *, struct mem_list *);
 static void print_list(struct mem_list *head);
-void reclaim_mem(void);
+static void reclaim_mem(void);
 
 static void malloc_init(void)
 {
@@ -84,12 +84,7 @@ void * malloc(size_t size)
 		printf("out of memory!");
 		return (void *)NULL;
 	}
-#if 1
-	printf("free\n");
-	print_list(&mem_free_list);
-	printf("used\n");
-	print_list(&mem_used_list);
-#endif
+
 	return (void *)((ulong)p + SIZEOF_MEMLIST);
 }
 
@@ -135,7 +130,7 @@ static void list_add(struct mem_list *head, struct mem_list *new)
 	}	
 }
 
-void print_list(struct mem_list *head)
+static void print_list(struct mem_list *head)
 {
 	struct mem_list *p;
 
@@ -152,7 +147,7 @@ void print_list(struct mem_list *head)
 	}
 }
 
-void reclaim_mem(void)
+static void reclaim_mem(void)
 {
 	struct mem_list *p, *q;
 

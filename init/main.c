@@ -8,7 +8,6 @@ extern void init_cpu_freq(void);
 extern u32 cpu_freq;
 extern void *malloc(size_t);
 extern void free(void *);
-extern void reclaim_mem(void);
 
 void main(void)
 {
@@ -29,10 +28,6 @@ void main(void)
 	free(p);
 	free(q);
 	free(r);
-	reclaim_mem();
-	printf("after reclaim\n");
-	p = malloc(100);
-	q = malloc(0x10000);
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
 }
