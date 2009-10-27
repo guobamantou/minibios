@@ -1,6 +1,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <panic.h>
+#include <autoconf.h>
 #include <loongson/addrspace.h>
 
 /* the memory size for heap is 208MB(224 - 16) in total(see Documents/memory-map.txt),
@@ -29,8 +30,26 @@ ulong cur_addr;		// current addr avilable for allocate
 
 static void list_add(struct mem_list *, struct mem_list *);
 static void list_del(struct mem_list *, struct mem_list *);
-static void print_list(struct mem_list *head);
 static void reclaim_mem(void);
+
+#ifdef CONFIG_DEBUG
+static void print_list(struct mem_list *head)
+{
+	struct mem_list *p;
+
+	if(head && head->next)
+		p = head->next;
+	else 	
+		return ;
+
+	while(p){
+		printf("addr is %x\n", p);
+		printf("next is %x\n", p->next);
+		printf("size is %x\n", p->size);
+		p = p->next;
+	}
+}
+#endif
 
 static void malloc_init(void)
 {
@@ -130,23 +149,6 @@ static void list_add(struct mem_list *head, struct mem_list *new)
 	}	
 }
 
-static void print_list(struct mem_list *head)
-{
-	struct mem_list *p;
-
-	if(head && head->next)
-		p = head->next;
-	else 	
-		return ;
-
-	while(p){
-		printf("addr is %x\n", p);
-		printf("next is %x\n", p->next);
-		printf("size is %x\n", p->size);
-		p = p->next;
-	}
-}
-
 static void reclaim_mem(void)
 {
 	struct mem_list *p, *q;
@@ -165,3 +167,4 @@ static void reclaim_mem(void)
 		}
 	}
 }
+

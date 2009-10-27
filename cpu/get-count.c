@@ -1,7 +1,7 @@
 #include <autoconf.h>
 #include <types.h>
 
-u32 get_count()
+u32 get_count(void)
 {
 	__asm__(
 		".set noreorder\n"
