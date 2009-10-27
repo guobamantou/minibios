@@ -79,11 +79,11 @@ void * malloc(size_t size)
 		}
 		list_add(&mem_used_list, p);
 	} else {
-	//	reclaim_mem();
+	//	reclaim_mem(); // called whan memory is used 228MB in tatol
 		printf("out of memory!");
 		return (void *)NULL;
 	}
-#if 1
+#if 0
 	printf("free\n");
 	print_list(&mem_free_list);
 	printf("used\n");
@@ -94,7 +94,12 @@ void * malloc(size_t size)
 
 void free(void * ptr)
 {
-
+	list_del(&mem_used_list, (struct mem_list *)(ptr - SIZEOF_MEMLIST));
+	list_add(&mem_free_list, (struct mem_list *)(ptr - SIZEOF_MEMLIST));
+	printf("free\n");
+	print_list(&mem_free_list);
+	printf("used\n");
+	print_list(&mem_used_list);
 }
 
 static void list_del(struct mem_list *head, struct mem_list *del)
@@ -133,7 +138,7 @@ static void list_add(struct mem_list *head, struct mem_list *new)
 	}	
 }
 
-static void print_list(struct mem_list *head)
+void print_list(struct mem_list *head)
 {
 	struct mem_list *p;
 
