@@ -1,10 +1,7 @@
-libs-y += cpu/delay.o cpu/get-count.o cpu/frequence.o
-
-cpu/delay.o: cpu/delay.c cpu/Makefile
-	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
-cpu/frequence.o: cpu/frequence.c cpu/Makefile
-	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
-cpu/get-count.o: cpu/get-count.c cpu/Makefile
-	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
+libs-$(CONFIG_DYMATIC_CPUFREQ) += cpu/frequence.o
+libs-$(CONFIG_LOONGSON2E) += cpu/loongson2e/
+libs-$(CONFIG_LOONGSON2F) += cpu/loongson2f/memcpy.o
+libs-$(CONFIG_LOONGSON2G) += cpu/loongson2g/
+libs-y += cpu/delay.o cpu/get-count.o 
 
 

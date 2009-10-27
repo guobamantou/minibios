@@ -1,8 +1,6 @@
-#include <autoconf.h>
 #include <types.h>
 #include <stdio.h>
 
-#ifdef CONFIG_DYMATIC_CPUFREQ
 extern u32 init_mfgpt0_and_detect_freq(void);
 extern u32 cpu_freq;
 extern void panic(const char *);
@@ -14,4 +12,3 @@ void detect_cpu_freq(void)
 		panic("cpu freq is too low\n");
 	cpu_freq = cpu_freq / 1000000;	
 }
-#endif

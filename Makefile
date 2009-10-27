@@ -27,12 +27,15 @@ MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
 MINIBIOSINCLUDE = $(src)/include  -I board/loongson2f-yeeloong-8089/include
 
+KCONFIG_CONFIG ?= .config
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 
+include .config
 minibios-head = $(head-y)
 minibios-main = $(core-y) $(libs-y) $(drivers-y)
 minibios-lds  = board/loongson2f-yeeloong-8089/ld.script
+
 
 export src obj
 export MINIBIOSVERSION
@@ -40,12 +43,10 @@ export head-y drivers-y libs-y
 all:	minibios Makefile
 include util/Makefile
 include init/Makefile
-include lib/Makefile
-include cpu/loongson2f/Makefile
 include cpu/Makefile
+include lib/Makefile
 include drivers/Makefile
 include mm/Makefile
-
 
 PHONY += all
 minibios:  $(minibios-head) $(minibios-main)
@@ -57,6 +58,8 @@ minibios:  $(minibios-head) $(minibios-main)
 PHONY += ctags
 ctags: clean
 	ctags -R --exclude="util"
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
 PHONY += prepare
 prepare:
 	@rm -rf $(obj)
