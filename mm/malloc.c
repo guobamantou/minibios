@@ -30,6 +30,7 @@ ulong cur_addr;		// current addr avilable for allocate
 static void list_add(struct mem_list *, struct mem_list *);
 static void list_del(struct mem_list *, struct mem_list *);
 static void print_list(struct mem_list *head);
+void reclaim_mem(void);
 
 static void malloc_init(void)
 {
@@ -79,11 +80,11 @@ void * malloc(size_t size)
 		}
 		list_add(&mem_used_list, p);
 	} else {
-	//	reclaim_mem(); // called whan memory is used 228MB in tatol
+		reclaim_mem(); // called whan memory is used 228MB in tatol
 		printf("out of memory!");
 		return (void *)NULL;
 	}
-#if 0
+#if 1
 	printf("free\n");
 	print_list(&mem_free_list);
 	printf("used\n");
@@ -96,10 +97,6 @@ void free(void * ptr)
 {
 	list_del(&mem_used_list, (struct mem_list *)(ptr - SIZEOF_MEMLIST));
 	list_add(&mem_free_list, (struct mem_list *)(ptr - SIZEOF_MEMLIST));
-	printf("free\n");
-	print_list(&mem_free_list);
-	printf("used\n");
-	print_list(&mem_used_list);
 }
 
 static void list_del(struct mem_list *head, struct mem_list *del)
@@ -152,5 +149,24 @@ void print_list(struct mem_list *head)
 		printf("next is %x\n", p->next);
 		printf("size is %x\n", p->size);
 		p = p->next;
+	}
+}
+
+void reclaim_mem(void)
+{
+	struct mem_list *p, *q;
+
+	p = mem_free_list.next;
+
+	while(p){
+		q = p->next;
+		if(q == NULL)	
+			return ; 
+		if(((ulong)(p->next)) == ((ulong)p + p->size + SIZEOF_MEMLIST)){
+			p->next = q->next;
+			p->size += q->size + SIZEOF_MEMLIST;
+		} else {
+			p = p->next;
+		}
 	}
 }
