@@ -11,7 +11,6 @@
 #ifdef CONFIG_LOONGSON2F
 #include <loongson/loongson2f/cp0.h>
 #include <loongson/loongson2f/nb_reg.h>
-#include <loongson/loongson2f/uart.h>
 #include <loongson/loongson2f/pciconf.h>
 #include <loongson/loongson2f/io.h>
 #include <loongson/loongson2f/exc_code.h>
@@ -96,9 +95,6 @@ loongson2g:
 init_nb:
 	/* init north bridge(virtual?) */
 	PRINTF("INIT North Bridge\r\n");
-#if 0
-	
-#endif
 
 #if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 detect_cs5536:

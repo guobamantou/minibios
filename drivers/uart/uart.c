@@ -2,7 +2,7 @@
 #include <uart.h>
 #include <autoconf.h>
 #ifdef CONFIG_LOONGSON2F
-#include <loongson/loongson2f/uart.h>
+#include <loongson/loongson2f/nb_reg.h>
 #endif
 #include <loongson/addrspace.h>
 
