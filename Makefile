@@ -25,17 +25,16 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
-MINIBIOSINCLUDE = $(src)/include  
+MINIBIOSINCLUDE = $(src)/include  -I $(src)/board/include
 
 include .config
 ifeq ($(CONFIG_LOONGSON2F_FULOONG),y)
-MINIBIOSINCLUDE += -I board/loongson2f-fuloong-600x/include
+MINIBIOSINCLUDE += -I board/loongson2f-fuloong-600x/
 endif
 ifeq ($(CONFIG_LOONGSON2F_YEELOONG),y)
-MINIBIOSINCLUDE += -I board/loongson2f-yeeloong-8089/include
+MINIBIOSINCLUDE += -I board/loongson2f-yeeloong-8089/
 endif
 
-KCONFIG_CONFIG ?= .config
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 
@@ -55,6 +54,8 @@ include lib/Makefile
 include drivers/Makefile
 include mm/Makefile
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
 PHONY += all
 minibios:  $(minibios-head) $(minibios-main)
 	$(LD) $^ -o minibios -e _start -T $(minibios-lds)
@@ -65,8 +66,6 @@ minibios:  $(minibios-head) $(minibios-main)
 PHONY += ctags
 ctags: clean
 	ctags -R --exclude="util"
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -mno-abicalls -I $(MINIBIOSINCLUDE) -o $@
 PHONY += prepare
 prepare:
 	@rm -rf $(obj)

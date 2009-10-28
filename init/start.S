@@ -5,6 +5,7 @@
 #include <autoconf.h>
 #include <loongson/regdef.h>
 #include <loongson/prid.h>
+#include <idsel.h>
 #include <uart.h>
 
 #ifdef CONFIG_LOONGSON2F
@@ -19,7 +20,6 @@
 #endif
 
 #if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
-#include <idsel.h>
 #include <cs5536.h>
 #endif
 

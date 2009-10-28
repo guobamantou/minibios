@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <debug.h>
+#include <delay.h>
 
 #ifdef CONFIG_DEBUG
 void print_flash_device(struct flash_device *dev)
@@ -139,7 +140,7 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 			dprintf("starting erase chip ... ");	
 			dev->ops->flash_erase_chip(dev);
 			while(dev->ops->flash_erase_busy(dev, 0)){
-				//udelay(10);
+				udelay(10);
 			}
 			dprintf("\n");	
 			dprintf("erase done!\n");	
@@ -156,7 +157,7 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 			dprintf("erase sector %d   ...",(offset >> 12));	
 			dev->ops->flash_erase_sector(dev,offset);	
 			while(dev->ops->flash_erase_busy(dev, offset)){	
-				//udelay(10);
+				udelay(10);
 			}
 			offset += sector_size;
 			dprintf("\n");	
@@ -193,7 +194,7 @@ int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, u8
 			dev->ops->flash_program(dev, i, *p++);	
 			while(dev->ops->flash_program_busy(dev, i)){
 				poll_output(100);	
-				//udelay(10);
+				udelay(10);
 			}
 		}
 		dprintf("program done!\n");	
