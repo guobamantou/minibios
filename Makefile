@@ -34,7 +34,7 @@ FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 include .config
 minibios-head = $(head-y)
 minibios-main = $(core-y) $(libs-y) $(drivers-y)
-minibios-lds  = board/loongson2f-yeeloong-8089/ld.script
+minibios-lds  = board/ld.script
 
 
 export src obj
