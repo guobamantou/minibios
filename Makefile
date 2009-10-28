@@ -25,13 +25,20 @@ src = $(shell pwd)
 obj = $(shell pwd)/build
 MINIBIOSVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)
 
-MINIBIOSINCLUDE = $(src)/include  -I board/loongson2f-yeeloong-8089/include
+MINIBIOSINCLUDE = $(src)/include  
+
+include .config
+ifeq ($(CONFIG_LOONGSON2F_FULOONG),y)
+MINIBIOSINCLUDE += -I board/loongson2f-fuloong-600x/include
+endif
+ifeq ($(CONFIG_LOONGSON2F_YEELOONG),y)
+MINIBIOSINCLUDE += -I board/loongson2f-yeeloong-8089/include
+endif
 
 KCONFIG_CONFIG ?= .config
 # Files to ingore in find statement
 FIND_IGNORE = \( -name .svn -o -name .git \) -prune -o
 
-include .config
 minibios-head = $(head-y)
 minibios-main = $(core-y) $(libs-y) $(drivers-y)
 minibios-lds  = board/ld.script
