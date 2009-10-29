@@ -45,14 +45,17 @@ _start:
 	mtc0	s0, CP0_STATUS
 	dli		sp, stack
 	
-	bal	locate
+	la	s0, _start
+	li	s1, 0xbfc00000
+	subu	OFFSET, s1, s0
+	bal	rom_speed
 	nop
 
 #include "exception.S"
 
 ########### WARNNING : DONT ADD ANY CODE ABOVE ####################
 
-locate:
+rom_speed:
 	/* rom accelerate */
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
 	lw	v1, 0(v0)
@@ -61,11 +64,8 @@ locate:
 	ori	v1, v1, 0x0f0c
 	sw	v1, 0(v0)
 
-	la	s0, _start
-	subu	OFFSET, ra, s0
-	lui	s1, 0xffff
 	bal	init_uart
-	and	OFFSET, s1  ## offset of PHYADDR and VIRTUREADDR 
+	nop
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID

@@ -1,10 +1,11 @@
 #include <types.h>
 #include <uart.h>
 #include <autoconf.h>
+#include <loongson/addrspace.h>
+
 #ifdef CONFIG_LOONGSON2F
 #include <loongson/loongson2f/nb_reg.h>
 #endif
-#include <loongson/addrspace.h>
 
 #define CONS_BAUD B115200
 u8* UART_BASE = (u8 *)PHY_TO_UNCACHED(UART_ADDR);
