@@ -49,7 +49,8 @@ _start:
 	li	s1, 0xbfc00000
 	subu	OFFSET, s1, s0
 
-#ifdef CONFIG_LOONGSON2F
+#ifndef CONFIG_LOONGSON2F
+rom_speed:
 	/* rom accelerate */
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
 	lw	v1, 0(v0)
@@ -65,7 +66,6 @@ _start:
 #include "exception.S"
 
 ########### WARNNING : DONT ADD ANY CODE ABOVE ####################
-
 next:
 	bal	init_uart
 	nop
@@ -193,10 +193,6 @@ detect_cs5536:
 	nop
 		
 2:	
-
-	li v0, 0x80808080
-	sb a0, 0(v0)
-
 	PRINTF("start.S done\r\n");
 	la	v0, main
 	jalr	v0

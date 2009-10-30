@@ -20,9 +20,27 @@
 
 /* uart definition*/
 #ifdef CONFIG_64BITS
-#define UART_ADDR 0xffffffff1ff003f8
+	#ifdef CONFIG_LOONGSON2F_YEELOONG
+	#define UART_ADDR 0xffffffff1ff003f8
+	#endif
+
+	#ifdef CONFIG_LOONGSON2F_FULOONG
+	#define UART_ADDR 0xffffffff1fd002f8
+	#endif
 #else
-#define UART_ADDR 0x1ff003f8
+	#ifdef CONFIG_LOONGSON2F_YEELOONG
+	#define UART_ADDR 0x1ff003f8
+	#endif
+	
+	#ifdef CONFIG_LOONGSON2F_FULOONG
+	#define UART_ADDR 0x1fd002f8
+	#endif
 #endif
 
+#ifdef CONFIG_LOONGSON2F_YEELOONG
 #define UART_BAUD 3686400
+#endif
+
+#ifdef CONFIG_LOONGSON2F_FULOONG
+#define UART_BAUD 18432000
+#endif

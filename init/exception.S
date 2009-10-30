@@ -28,7 +28,9 @@ exc_cpu:
 exc_ov:
 .asciz "arithmetic overflow   \r\n"
 exc_tr:
-.asciz "trap exception\r\n"
+.asciz "trap exception        \r\n"
+exc_reserved:
+.asciz "reserved exception ^6^\r\n"
 exc_fpe:
 .asciz "float-point exception\r\n"
 exc_watch:
@@ -58,7 +60,7 @@ dump_reg:
 	PRINTF("\r\n");
 
 detail:
-	sltiu	a0, s0, (EXC_TR + 1)		
+	sltiu	a0, s0, (EXC_FPE + 1)		
 	beq		a0, zero, 1f	# >EXC_TR
 	nop
 	la		a0, exc_int 
@@ -71,26 +73,27 @@ detail:
 	b	stop
 	nop
 1:
-	li		a0, EXC_FPE
-	bne		a0, s0, 1f
-	nop
-	la		a0, exc_fpe
-	bal		uart_puts
-	nop
-1:
 	li		a0, EXC_WATCH
 	bne		a0, s0, 1f
 	nop
-	la		a0, exc_fpe
+	la		a0, exc_watch
 	bal		uart_puts
+	nop
+	b stop
 	nop
 1:
 	PRINTF("unknown exception ^.^\r\n");
-	b stop
-	nop
 	
 stop:
 	b	stop
+	nop         /* these nops make other_exc located at 0xbfc00380 */
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 	nop
 /* locate in addr 0xbfc00380*/
 
@@ -99,5 +102,4 @@ other_exc:
 	PRINTF("other exception !\r\n");
 	bal	dump_reg
 	nop
-
 

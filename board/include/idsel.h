@@ -6,3 +6,7 @@
 #define NEC0035_IDSEL 	9  /*I dont know the name exactly,0035 is product id*/
 #define CS5536_IDSEL	14
 #endif
+
+#ifdef CONFIG_LOONGSON2F_FULOONG
+#define CS5536_IDSEL	14
+#endif
