@@ -48,14 +48,8 @@ _start:
 	la	s0, _start
 	li	s1, 0xbfc00000
 	subu	OFFSET, s1, s0
-	bal	rom_speed
-	nop
 
-#include "exception.S"
-
-########### WARNNING : DONT ADD ANY CODE ABOVE ####################
-
-rom_speed:
+#ifdef CONFIG_LOONGSON2F
 	/* rom accelerate */
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
 	lw	v1, 0(v0)
@@ -63,7 +57,16 @@ rom_speed:
 	and	v1, v1, a0
 	ori	v1, v1, 0x0f0c
 	sw	v1, 0(v0)
+#endif
 
+	b	next
+	nop
+
+#include "exception.S"
+
+########### WARNNING : DONT ADD ANY CODE ABOVE ####################
+
+next:
 	bal	init_uart
 	nop
 
@@ -180,7 +183,7 @@ detect_cs5536:
 	addiu	s0, 8
 
 	/* create bss section */	
-	la	v1 , _end		##  data end addr(bss is special)
+	la	v1 , _end		##  data segment end(bss is special)
 	beq v0, v1, 2f
 	nop
 1:	
@@ -190,8 +193,11 @@ detect_cs5536:
 	nop
 		
 2:	
-	PRINTF("start.S done\r\n");
 
+	li v0, 0x80808080
+	sb a0, 0(v0)
+
+	PRINTF("start.S done\r\n");
 	la	v0, main
 	jalr	v0
 	nop
