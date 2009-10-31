@@ -27,7 +27,6 @@ init_uart:
 	/* disable all intrrupt */
 	j 	ra
 	sb	zero, UART_IER(t0)
-endof_init_uart:
 
 
 /************************************************************/
@@ -36,7 +35,7 @@ endof_init_uart:
 uart_putc: 
 	li	t0,	PHY_TO_UNCACHED(UART_ADDR)	
 	
-	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
+	li	t1, 10000  /* try for 1000 times, this times is not strictly test*/
 retry:
 	addi	t1, t1, -1
 	beq	t1, zero,11f 
@@ -51,7 +50,6 @@ retry:
 11:
 	jr	ra
 	nop
-endof_uart_putc:
 
 
 /************************************************************/
@@ -80,7 +78,6 @@ next_hex:
 	nop
 	j a3
 	nop
-endof_uart_put_hex:
 hexchar:
 	.ascii "0123456789ABCDEF"
 
@@ -104,4 +101,3 @@ next_char:
 11:
 	j	a3
 	nop
-endof_uart_puts:

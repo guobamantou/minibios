@@ -35,6 +35,15 @@
 #define CS5536_SMB_BASE			(CS5536_DIVIL_MSR_BASE | 0x0b)
 #define CS5536_GPIO_BASE		(CS5536_DIVIL_MSR_BASE | 0x0c)
 #define CS5536_MFGPT_BASE		(CS5536_DIVIL_MSR_BASE | 0x0d)
+#define CS5536_LEGACY_IO		(CS5536_DIVIL_MSR_BASE | 0x14)
+#define CS5536_UART2_CONF		(CS5536_DIVIL_MSR_BASE | 0x3e)
+
+/*
+ * UART2 definition
+ */
+
+#define UART2_TX 4
+#define UART2_RX 3
 
 /*
  * SMB definition

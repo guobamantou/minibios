@@ -143,6 +143,5 @@ smb_wait:
 	li	v0, 1
 
 	
-endof_smb_wait:
 
 

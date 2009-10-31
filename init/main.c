@@ -11,6 +11,7 @@ extern void free(void *);
 
 void main(void)
 {
+#if 0
 	int i;
 	struct flash_device flash_dev;
 	char *p, *q, *r;
@@ -30,6 +31,7 @@ void main(void)
 	free(r);
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
+#endif
 }
 
 

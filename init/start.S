@@ -27,7 +27,9 @@
 #define	PHY_TO_UNCACHED(p)	((p)|0xffffffffa0000000)
 #define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
-#define PRINTF(str) \
+#define PRINTF(srt) 
+
+#define SAFEPRINTF(str) \
 	.rdata ;\
 2009: ;\
 	.asciz str ;\
@@ -49,7 +51,7 @@ _start:
 	li	s1, 0xbfc00000
 	subu	OFFSET, s1, s0
 
-#ifndef CONFIG_LOONGSON2F
+#ifdef CONFIG_LOONGSON2F
 rom_speed:
 	/* rom accelerate */
 	dli	v0, PHY_TO_UNCACHED(LIO_CFG)
@@ -67,8 +69,11 @@ rom_speed:
 
 ########### WARNNING : DONT ADD ANY CODE ABOVE ####################
 next:
+
+#ifdef CONFIG_LOONGSON2F_YEELOONG
 	bal	init_uart
 	nop
+#endif
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID
@@ -99,7 +104,7 @@ init_nb:
 	/* init north bridge(virtual?) */
 	PRINTF("INIT North Bridge\r\n");
 
-#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
+#ifdef CONFIG_LOONGSON2F_YEELOONG
 detect_cs5536:
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	dli	a0, CS5536ID
@@ -116,12 +121,14 @@ detect_cs5536:
 	nop
 22:
 	PRINTF("find amd cs5536 south brigde\r\n");
-	
+#endif	
+
+#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 	/*enable msr access*/
 	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_CTRL, MSR_EN);
 
 	/*enable all ports*/
-	CS5536_MSR_WRITE(CS5536_PORT_EN, 0xffff, 0x0)
+	CS5536_MSR_WRITE(CS5536_PORT_EN, 0xffff, 0x0);
 /*
  * because we will operate smb bus shortly, 
  * set base addr manually now, and gpio base addr
@@ -130,6 +137,26 @@ detect_cs5536:
 #define DIVIL_BASE_ADDR     0xB000
 #define SMB_BASE_ADDR       (DIVIL_BASE_ADDR | 0x320)
 #define GPIO_BASE_ADDR      (DIVIL_BASE_ADDR | 0x000)
+
+/* FULOONG use uart2 as default serial, initial now */
+
+#ifdef CONFIG_LOONGSON2F_FULOONG
+	/* set uart2 io addr to 0x02f8, default val is 04000003 */
+	CS5536_MSR_WRITE(CS5536_LEGACY_IO, 0x04500003, 0); 
+	
+	/* enable uart2 */
+	CS5536_MSR_WRITE(CS5536_UART2_CONF, 2, 0);
+
+	GPIO_HI_BIT(UART2_RX, GPIO_BASE_ADDR | GPIOL_IN_EN); 
+	GPIO_HI_BIT(UART2_RX, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL); 
+
+	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_EN); 
+	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL); 
+
+	bal init_uart
+	nop
+	SAFEPRINTF("INIT OK UAR");
+#endif
 
 	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0xf001);
 	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
@@ -146,17 +173,17 @@ detect_cs5536:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	PRINTF("Init smbus\r\n");
+	SAFEPRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
 	
 #endif
 
-	PRINTF("init ddr2 now!\r\n");
+	SAFEPRINTF("init ddr2 now!\r\n");
 	bal	ddr2_cfg
 	nop
 
-	PRINTF("init cache now!\r\n");
+	SAFEPRINTF("init cache now!\r\n");
 	bal	init_cache
 	nop
 
@@ -169,7 +196,7 @@ detect_cs5536:
 	mtc0	a0, CP0_CONFIG
 #endif
 
-	PRINTF("COPY IMAGE TO MEMORY........\r\n");
+	SAFEPRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr
 	la	v1, _edata		##  data end addr(bss is special)
 
@@ -193,7 +220,7 @@ detect_cs5536:
 	nop
 		
 2:	
-	PRINTF("start.S done\r\n");
+	SAFEPRINTF("start.S done\r\n");
 	la	v0, main
 	jalr	v0
 	nop

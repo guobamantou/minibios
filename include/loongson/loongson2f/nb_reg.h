@@ -42,5 +42,5 @@
 #endif
 
 #ifdef CONFIG_LOONGSON2F_FULOONG
-#define UART_BAUD 18432000
+#define UART_BAUD 1843200
 #endif
