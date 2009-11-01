@@ -155,8 +155,10 @@ detect_cs5536:
 #define SMB_BASE_ADDR       (DIVIL_BASE_ADDR | 0x320)
 #define GPIO_BASE_ADDR      (DIVIL_BASE_ADDR | 0x000)
 
+	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0xf001);
+	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
+	
 /* FULOONG use uart2 as default serial, initial now */
-
 #ifdef CONFIG_LOONGSON2F_FULOONG
 	/* set uart2 io addr to 0x02f8, default val is 04000003 */
 	CS5536_MSR_WRITE(CS5536_LEGACY_IO, 0x04500003, 0); 
@@ -170,14 +172,8 @@ detect_cs5536:
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_EN); 
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL); 
 
-	bal init_uart
-	nop
-	SAFEPRINTF("INIT OK UAR");
 #endif
 
-	CS5536_MSR_WRITE(CS5536_SMB_BASE, SMB_BASE_ADDR, 0xf001);
-	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
-	
 	/* config gpio14 to be smb_clk and gpio15 to be smb_data */
 	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
     GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
@@ -190,10 +186,14 @@ detect_cs5536:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	SAFEPRINTF("Init smbus\r\n");
+	PRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
-	
+
+#ifdef CONFIG_LOONGSON2F_FULOONG	
+	bal init_uart
+	nop	
+#endif
 #endif
 
 	SAFEPRINTF("init ddr2 now!\r\n");
