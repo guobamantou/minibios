@@ -28,14 +28,7 @@
 #define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
 #ifdef CONFIG_LOONGSON2F_YEELOONG
-#define PRINTF(srt) \
-	.rdata ;\
-2009: ;\
-	.asciz str ;\
-	.text ;\
-	la	a0, 2009b ;\
-	bal	uart_puts ;\
-	nop
+#define PRINTF(str) SAFEPRINTF(str)
 #endif
 
 #ifdef CONFIG_LOONGSON2F_FULOONG
@@ -159,6 +152,7 @@ detect_cs5536:
 	CS5536_MSR_WRITE(CS5536_GPIO_BASE, GPIO_BASE_ADDR, 0xf001);
 	
 /* FULOONG use uart2 as default serial, initial now */
+
 #ifdef CONFIG_LOONGSON2F_FULOONG
 	/* set uart2 io addr to 0x02f8, default val is 04000003 */
 	CS5536_MSR_WRITE(CS5536_LEGACY_IO, 0x04500003, 0); 
@@ -171,6 +165,9 @@ detect_cs5536:
 
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_EN); 
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL); 
+	
+	bal init_uart
+	nop	
 
 #endif
 
@@ -186,14 +183,9 @@ detect_cs5536:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	PRINTF("Init smbus\r\n");
+	SAFEPRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
-
-#ifdef CONFIG_LOONGSON2F_FULOONG	
-	bal init_uart
-	nop	
-#endif
 #endif
 
 	SAFEPRINTF("init ddr2 now!\r\n");
@@ -247,10 +239,6 @@ detect_cs5536:
 	b	2b
 	nop
 
-
-/**************************************************************************/
-/*******************  procedures used in this file  ***********************/
-/**************************************************************************/
 #include "cache.S"
 
 #include "ddr2.S"
