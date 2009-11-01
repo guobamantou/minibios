@@ -27,7 +27,20 @@
 #define	PHY_TO_UNCACHED(p)	((p)|0xffffffffa0000000)
 #define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
+#ifdef CONFIG_LOONGSON2F_YEELOONG
+#define PRINTF(srt) \
+	.rdata ;\
+2009: ;\
+	.asciz str ;\
+	.text ;\
+	la	a0, 2009b ;\
+	bal	uart_puts ;\
+	nop
+#endif
+
+#ifdef CONFIG_LOONGSON2F_FULOONG
 #define PRINTF(srt) 
+#endif
 
 #define SAFEPRINTF(str) \
 	.rdata ;\
@@ -104,26 +117,30 @@ init_nb:
 	/* init north bridge(virtual?) */
 	PRINTF("INIT North Bridge\r\n");
 
-#ifdef CONFIG_LOONGSON2F_YEELOONG
+#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 detect_cs5536:
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	dli	a0, CS5536ID
 	beq a0, v0, 22f
 	nop
+
+#ifdef CONFIG_LOONGSON2F_FULOONG // cs5536 may not ready in fuloong platform now, retry
+	b detect_cs5536
+	nop
+#endif
+
 11:	
 	PRINTF("find unknow south brigde:0x");
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	add a0, v0, zero
 	bal	uart_put_hex
 	nop
-	PRINTF("\r\n")
+	PRINTF("\r\n");
 	b	11b	
 	nop
 22:
 	PRINTF("find amd cs5536 south brigde\r\n");
-#endif	
 
-#if defined(CONFIG_LOONGSON2F_YEELOONG) || defined(CONFIG_LOONGSON2F_FULOONG)
 	/*enable msr access*/
 	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_CTRL, MSR_EN);
 
