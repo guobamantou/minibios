@@ -211,9 +211,6 @@ detect_cs5536:
 	nop
 #endif
 
-	li v0, 0
-	sb a0, 0(v0)
-
 	SAFEPRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr
 	la	v1, _edata		##  data end addr(bss is special)
