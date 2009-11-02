@@ -49,3 +49,8 @@
 #define ICACHE_SIZE_START_BIT	9
 #define DCACHE_LINE_SIZE_START_BIT	4
 #define ICACHE_LINE_SIZE_START_BIT	5
+
+/*CP0_PAGEMASK*/
+
+#define PAGE4K_MASK (000 << 13)   // see 2f user manual for detail(table 5-6)
+#define PAGE16K_MASK (003 << 13)

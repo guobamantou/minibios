@@ -46,7 +46,7 @@ minibios-lds  = board/ld.script
 export src obj
 export MINIBIOSVERSION
 export head-y drivers-y libs-y
-all:	minibios Makefile
+all:	.config minibios Makefile 
 include util/Makefile
 include init/Makefile
 include cpu/Makefile

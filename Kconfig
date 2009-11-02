@@ -17,6 +17,10 @@ config ENABLE_CACHE
 	bool "enable cache"
 	help
 		enable cache in minibios	
+config	CLEAR_TLB 
+	bool "clear TLB"
+	help
+		clear TLB when boot in minibios
 endmenu
 
 menu "Board selection"
