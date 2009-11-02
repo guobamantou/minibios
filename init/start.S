@@ -116,8 +116,12 @@ detect_cs5536:
 	dli	a0, CS5536ID
 	beq a0, v0, 22f
 	nop
+/* cs5536 may not ready here in fuloong platform, 
+ * and I test, about 5ms after the first instruct executed, 
+ * pci configure space can be accessed normally 
+ * test in a fuloong 6003 which code is FLF1CCA27000314*/
 
-#ifdef CONFIG_LOONGSON2F_FULOONG // cs5536 may not ready in fuloong platform now, retry
+#ifdef CONFIG_LOONGSON2F_FULOONG 	
 	b detect_cs5536
 	nop
 #endif
