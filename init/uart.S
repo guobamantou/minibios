@@ -35,7 +35,7 @@ init_uart:
 uart_putc: 
 	li	t0,	PHY_TO_UNCACHED(UART_ADDR)	
 	
-	li	t1, 1000000  /* try for 1000 times, this times is not strictly test*/
+	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
 retry:
 	addi	t1, t1, -1
 	beq	t1, zero,11f 
