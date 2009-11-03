@@ -45,6 +45,17 @@
 #define UART2_TX 4
 #define UART2_RX 3
 
+#ifdef CONFIG_LOONGSON2F_FULOONG
+#define UART_BAUD 1843200
+
+#ifdef CONFIG_64BITS
+#define UART_ADDR 0xffffffff1fd002f8
+#else
+#define UART_ADDR 0x1fd002f8
+#endif
+
+#endif
+
 /*
  * SMB definition
  */

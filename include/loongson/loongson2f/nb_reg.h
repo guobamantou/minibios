@@ -19,28 +19,14 @@
 #define DISABLE_DDR_CFG		(1 << 8)
 
 /* uart definition*/
-#ifdef CONFIG_64BITS
-	#ifdef CONFIG_LOONGSON2F_YEELOONG
-	#define UART_ADDR 0xffffffff1ff003f8
-	#endif
-
-	#ifdef CONFIG_LOONGSON2F_FULOONG
-	#define UART_ADDR 0xffffffff1fd002f8
-	#endif
-#else
-	#ifdef CONFIG_LOONGSON2F_YEELOONG
-	#define UART_ADDR 0x1ff003f8
-	#endif
-	
-	#ifdef CONFIG_LOONGSON2F_FULOONG
-	#define UART_ADDR 0x1fd002f8
-	#endif
-#endif
-
 #ifdef CONFIG_LOONGSON2F_YEELOONG
 #define UART_BAUD 3686400
+
+#ifdef CONFIG_64BITS
+#define UART_ADDR 0xffffffff1ff003f8
+#else
+#define UART_ADDR 0x1ff003f8
 #endif
 
-#ifdef CONFIG_LOONGSON2F_FULOONG
-#define UART_BAUD 1843200
 #endif
+

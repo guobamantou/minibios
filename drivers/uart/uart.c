@@ -3,8 +3,11 @@
 #include <autoconf.h>
 #include <loongson/addrspace.h>
 
-#ifdef CONFIG_LOONGSON2F
+#ifdef CONFIG_LOONGSON2F_YEELOONG
 #include <loongson/loongson2f/nb_reg.h>
+#endif
+#ifdef CONFIG_LOONGSON2F_FULOONG
+#include <cs5536.h>
 #endif
 
 #define CONS_BAUD B115200
