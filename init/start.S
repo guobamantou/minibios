@@ -27,15 +27,7 @@
 #define	PHY_TO_UNCACHED(p)	((p)|0xffffffffa0000000)
 #define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
-#ifdef CONFIG_LOONGSON2F_YEELOONG
-#define PRINTF(str) SAFEPRINTF(str)
-#endif
-
-#ifdef CONFIG_LOONGSON2F_FULOONG
-#define PRINTF(srt) 
-#endif
-
-#define SAFEPRINTF(str) \
+#define PRINTF(str) \
 	.rdata ;\
 2009: ;\
 	.asciz str ;\
@@ -187,16 +179,16 @@ detect_cs5536:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	SAFEPRINTF("Init smbus\r\n");
+	PRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
 #endif
 
-	SAFEPRINTF("init ddr2 now!\r\n");
+	PRINTF("init ddr2 now!\r\n");
 	bal	ddr2_cfg
 	nop
 
-	SAFEPRINTF("init cache now!\r\n");
+	PRINTF("init cache now!\r\n");
 	bal	init_cache
 	nop
 
@@ -210,12 +202,12 @@ detect_cs5536:
 #endif
 
 #ifdef CONFIG_CLEAR_TLB
-	SAFEPRINTF("init TLB now!\r\n");
+	PRINTF("init TLB now!\r\n");
 	bal	init_tlb
 	nop
 #endif
 
-	SAFEPRINTF("COPY IMAGE TO MEMORY........\r\n");
+	PRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr
 	la	v1, _edata		##  data end addr(bss is special)
 
@@ -239,7 +231,7 @@ detect_cs5536:
 	nop
 		
 2:	
-	SAFEPRINTF("start.S done\r\n");
+	PRINTF("start.S done\r\n");
 	la	v0, main
 	jalr	v0
 	nop

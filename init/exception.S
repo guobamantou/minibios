@@ -39,25 +39,25 @@ exc_watch:
 /* in addr 0xbfc00200*/
 .align 9
 tlb_exc:
-	SAFEPRINTF("XTLB refill exception!\r\n");
+	PRINTF("XTLB refill exception!\r\n");
 
 dump_reg:	
-	SAFEPRINTF("cause reg : 0x");
+	PRINTF("cause reg : 0x");
 	mfc0	a0, CP0_CAUSE
 	bal		uart_put_hex
 	nop
-	SAFEPRINTF("\r\n      EPC : 0x");
+	PRINTF("\r\n      EPC : 0x");
 	mfc0	a0, CP0_EPC
 	bal		uart_put_hex
 	nop
-	SAFEPRINTF("\r\n Exc-Code : 0x");
+	PRINTF("\r\n Exc-Code : 0x");
 	mfc0	s0, CP0_CAUSE
 	andi	s0, EXC_CODE 
 	srl		s0, s0, 2	
 	add		a0, s0, zero
 	bal		uart_put_hex
 	nop
-	SAFEPRINTF("\r\n");
+	PRINTF("\r\n");
 
 detail:
 	sltiu	a0, s0, (EXC_FPE + 1)		
@@ -82,7 +82,7 @@ detail:
 	b stop
 	nop
 1:
-	SAFEPRINTF("unknown exception ^.^\r\n");
+	PRINTF("unknown exception ^.^\r\n");
 	
 stop:
 	b	stop
@@ -99,7 +99,7 @@ stop:
 
 .align	7
 other_exc:
-	SAFEPRINTF("other exception !\r\n");
+	PRINTF("other exception !\r\n");
 	bal	dump_reg
 	nop
 
