@@ -89,14 +89,12 @@ loongson2e:
 	PRINTF("NOT SUPPORT\r\n");	
 	b	init_nb
 	nop	
-loongson2f:
-	PRINTF("LOONGSON 2F founded!\r\n");	
-	b	init_nb
-	nop	
 loongson2g:
 	PRINTF("LOONGSON 2G founded!\r\n");	
 	b	init_nb
 	nop	
+loongson2f:
+	PRINTF("LOONGSON 2F founded!\r\n");	
 
 init_nb:
 	/* init north bridge(virtual?) */
@@ -109,15 +107,17 @@ detect_cs5536:
 	beq a0, v0, 22f
 	nop
 /* cs5536 may not ready here in fuloong platform, 
- * and I test, about 5ms after the first instruct executed, 
- * pci configure space can be accessed normally 
- * test in a fuloong 6003 which code is FLF1CCA27000314*/
+ * I test, about 5ms after the first instruct executed, 
+ * pci configure space can be accessed normally. 
+ * test in a fuloong 6003 which code is FLF1CCA27000314
+ */
 
 #ifdef CONFIG_LOONGSON2F_FULOONG 	
 	b detect_cs5536
 	nop
 #endif
 
+#ifdef CONFIG_LOONGSON2F_YEELOONG
 11:	
 	PRINTF("find unknow south brigde:0x");
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
@@ -127,6 +127,8 @@ detect_cs5536:
 	PRINTF("\r\n");
 	b	11b	
 	nop
+#endif
+
 22:
 	PRINTF("find amd cs5536 south brigde\r\n");
 
@@ -164,7 +166,6 @@ detect_cs5536:
 	
 	bal init_uart
 	nop	
-
 #endif
 
 	/* config gpio14 to be smb_clk and gpio15 to be smb_data */
