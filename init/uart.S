@@ -9,7 +9,7 @@ init_uart:
 	sb	t1, UART_FCR(t0)
 
 	/* set baud rate */
-	li	t2, UART_LCR_DLAB
+	li	t2, UART_LCR_DLAB  // enable set band rate
 	sb	t2, UART_LCR(t0)
 	li	t3, UART_BAUD / (16 * B115200)
 	sb	t3, UART_DLL(t0)
@@ -37,13 +37,12 @@ uart_putc:
 	
 	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
 retry:
-	addi	t1, t1, -1
 	beq	t1, zero,11f 
 	nop
 	lbu	t2, UART_LSR(t0)
 	and	t2, UART_LSR_THRE
 	beq	t2, zero, retry
-	nop
+	addi	t1, t1, -1
 
 	/* can transmit now */	
 	sb	a0, UART_TX(t0)
@@ -57,7 +56,7 @@ retry:
 /************************************************************/
 /******** use a0-a3, v0-v1, ra, t8 **********************/
 uart_put_hex:
-### store ra first ,because this procedure will call another procedure
+### store ra first ,because uart_put_hex will call uart_putc
 	add	a3, ra, zero  
 	add	a1, a0, zero
 	la	v0, hexchar
@@ -72,10 +71,10 @@ next_hex:
 	lb	a0, 0(t8)
 	bal uart_putc
 	nop
-	sll	a1, 4
 	addi a2, -1
 	bnez a2, next_hex
-	nop
+	sll	a1, 4
+
 	j a3
 	nop
 hexchar:
@@ -92,7 +91,7 @@ uart_puts:
 	lbu	a0, 0(t8)
 
 next_char:
-	beqz a0, 11f 
+	beq a0, zero, 11f 
 	nop
 	bal	uart_putc
 	addiu t8, 1
