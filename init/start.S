@@ -27,7 +27,13 @@
 #define	PHY_TO_UNCACHED(p)	((p)|0xffffffffa0000000)
 #define	PHY_TO_CACHED(p)	((p)|0xffffffff80000000)
 
-#define PRINTF(str) \
+#ifdef CONFIG_LOONGSON2F_FULOONG
+#define PRINTF(str) 
+#else
+#define PRINTF(str) REALPRINTF(str)
+#endif
+
+#define REALPRINTF(str) \
 	.rdata ;\
 2009: ;\
 	.asciz str ;\
@@ -106,6 +112,7 @@ detect_cs5536:
 	dli	a0, CS5536ID
 	beq a0, v0, 22f
 	nop
+
 /* cs5536 may not ready here in fuloong platform, 
  * I test, about 5ms after the first instruct executed, 
  * pci configure space can be accessed normally. 
@@ -119,7 +126,7 @@ detect_cs5536:
 
 #ifdef CONFIG_LOONGSON2F_YEELOONG
 11:	
-	PRINTF("find unknow south brigde:0x");
+	PRINTF("find unknow SB:0x");
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	add a0, v0, zero
 	bal	uart_put_hex
@@ -130,7 +137,7 @@ detect_cs5536:
 #endif
 
 22:
-	PRINTF("find amd cs5536 south brigde\r\n");
+	PRINTF("find cs5536\r\n");
 
 	/*enable msr access*/
 	BUS0_PCICFG_WRITE(CS5536_IDSEL, 0, MSR_CTRL, MSR_EN);
@@ -180,16 +187,16 @@ detect_cs5536:
     GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
-	PRINTF("Init smbus\r\n");
+	REALPRINTF("Init smbus\r\n");
 	bal	init_smb
 	nop
 #endif
 
-	PRINTF("init ddr2 now!\r\n");
+	REALPRINTF("Init ddr2\r\n");
 	bal	ddr2_cfg
 	nop
 
-	PRINTF("init cache now!\r\n");
+	REALPRINTF("Init cache\r\n");
 	bal	init_cache
 	nop
 
@@ -203,12 +210,12 @@ detect_cs5536:
 #endif
 
 #ifdef CONFIG_CLEAR_TLB
-	PRINTF("init TLB now!\r\n");
+	REALPRINTF("Init TLB\r\n");
 	bal	init_tlb
 	nop
 #endif
 
-	PRINTF("COPY IMAGE TO MEMORY........\r\n");
+	REALPRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr
 	la	v1, _edata		##  data end addr(bss is special)
 
@@ -232,7 +239,7 @@ detect_cs5536:
 	nop
 		
 2:	
-	PRINTF("start.S done\r\n");
+	REALPRINTF("start.S done\r\n");
 	la	v0, main
 	jalr	v0
 	nop
