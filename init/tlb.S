@@ -20,4 +20,5 @@ next_index:
 	tlbwi
 	bne	a1, a0, next_index
 	nop
-	
+	j ra	
+	nop

@@ -11,7 +11,7 @@ extern void free(void *);
 
 void main(void)
 {
-#if 0
+
 	int i;
 	struct flash_device flash_dev;
 	char *p, *q, *r;
@@ -23,15 +23,8 @@ void main(void)
 	init_cpu_freq();
 
 	printf("cpu freq is %d\n", cpu_freq);
-	p = malloc(100);
-	q = malloc(0x10000);
-	r = malloc(12);
-	free(p);
-	free(q);
-	free(r);
 	while(1);
 	asm (".set mips3\n dli $2, 0xffffffffbfc00000;jalr $2":::"$2");
-#endif
 }
 
 
