@@ -6,7 +6,7 @@ ARCH = mips
 CROSS_COMPILE = mipsel-linux-gnu-
 
 AR	= $(CROSS_COMPILE)ar
-AS	= $(CROSS_COMPILE)as
+AS	= $(CROSS_COMPILE)as 
 CC	= $(CROSS_COMPILE)gcc
 CPP	= $(CC) -E
 LD	= $(CROSS_COMPILE)ld
