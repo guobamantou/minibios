@@ -8,8 +8,8 @@
 #include <loongson/loongson2f/nb_reg.h>
 #endif
 
-#define PCICONF_TYPE0	0
-#define PCICONF_TYPE1	1
+#define PCICONF_TYPE0	(0 << 16)
+#define PCICONF_TYPE1	(1 << 16)
 #define UNCACHED(reg) (*(volatile u32 *)(PHY_TO_UNCACHED(reg)))
 
 u32 MSR_ADDR  = (1 << (11 + CS5536_IDSEL)) | (0 << 8) | 0xf4;
