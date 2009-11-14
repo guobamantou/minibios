@@ -47,9 +47,9 @@ stack = 0xffffffff90000000-0x100000
 _start:
 	mtc0	zero, CP0_STATUS 
 	mtc0	zero, CP0_CAUSE 
-	dli		s0, STATUS_BEV
+	dli	s0, STATUS_BEV
 	mtc0	s0, CP0_STATUS
-	dli		sp, stack
+	dli	sp, stack
 	
 	la	s0, _start
 	li	s1, 0xbfc00000
@@ -81,13 +81,13 @@ next:
 
 cpu_detect: 
 	mfc0	s0, CP0_PRID
-	li	a0,	LOONGSON2F_PRID	
+	li	a0, LOONGSON2F_PRID	
 	beq	a0, s0, loongson2f
 	nop
-	li	a0,	LOONGSON2E_PRID	
+	li	a0, LOONGSON2E_PRID	
 	beq	a0, s0, loongson2e
 	nop
-	li	a0,	LOONGSON2G_PRID	
+	li	a0, LOONGSON2G_PRID	
 	beq	a0, s0, loongson2g
 	nop
 loongson2e:
@@ -110,7 +110,7 @@ init_nb:
 detect_cs5536:
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
 	dli	a0, CS5536ID
-	beq a0, v0, 22f
+	beq	a0, v0, 22f
 	nop
 
 /* cs5536 may not ready here in fuloong platform, 
@@ -120,7 +120,7 @@ detect_cs5536:
  */
 
 #ifdef CONFIG_LOONGSON2F_FULOONG 	
-	b detect_cs5536
+	b	detect_cs5536
 	nop
 #endif
 
@@ -128,7 +128,7 @@ detect_cs5536:
 11:	
 	PRINTF("find unknow SB:0x");
 	BUS0_PCICFG_READ(CS5536_IDSEL, 0, 0x0);
-	add a0, v0, zero
+	add	a0, v0, zero
 	bal	uart_put_hex
 	nop
 	PRINTF("\r\n");
@@ -171,20 +171,20 @@ detect_cs5536:
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_EN); 
 	GPIO_HI_BIT(UART2_TX, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL); 
 	
-	bal init_uart
+	bal	init_uart
 	nop	
 #endif
 
 	/* config gpio14 to be smb_clk and gpio15 to be smb_data */
 	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
-    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
-    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
-    GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
+	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
+	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
+	GPIO_HI_BIT(SMB_CLK_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
-    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
-    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
-    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
-    GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
+	GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_EN);
+	GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_EN);
+	GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_IN_AUX1_SEL);
+	GPIO_HI_BIT(SMB_DATA_PIN, GPIO_BASE_ADDR | GPIOL_OUT_AUX1_SEL);
 
 	/* init smbus */
 	REALPRINTF("Init smbus\r\n");
@@ -203,9 +203,9 @@ detect_cs5536:
 #ifdef CONFIG_ENABLE_CACHE
 	/*enable cache*/
 	mfc0	a0, CP0_CONFIG
-	dli		a1, 0xfffffff8	## dont afraid, use 32bit in deed
+	dli	a1, 0xfffffff8	## dont afraid, use 32bit in deed
 	and 	a0, a0, a1
-	ori		a0, 3
+	ori	a0, 3
 	mtc0	a0, CP0_CONFIG
 #endif
 
@@ -230,7 +230,7 @@ detect_cs5536:
 
 	/* create bss section */	
 	la	v1 , _end		##  data segment end(bss is special)
-	beq v0, v1, 2f
+	beq	v0, v1, 2f
 	nop
 1:	
 	sd	zero, 0(v0)	

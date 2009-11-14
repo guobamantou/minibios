@@ -13,7 +13,7 @@ init_uart:
 	sb	t2, UART_LCR(t0)
 	li	t3, UART_BAUD / (16 * B115200)
 	sb	t3, UART_DLL(t0)
-	srl t3, 8
+	srl	t3, 8
 	sb	t3, UART_DLH(t0)
 
 	/* set transmit format */
@@ -21,7 +21,7 @@ init_uart:
 	sb	t1, UART_LCR(t0)	
 
 	/* set modem mode */
-	li  t2, UART_MCR_RTS | UART_MCR_DTR
+	li	t2, UART_MCR_RTS | UART_MCR_DTR
 	sb	t2, UART_MCR(t0)
 	
 	/* disable all intrrupt */
@@ -33,7 +33,7 @@ init_uart:
 /********** use t0-t3, a0 ra **********/
 
 uart_putc: 
-	li	t0,	PHY_TO_UNCACHED(UART_ADDR)	
+	li	t0, PHY_TO_UNCACHED(UART_ADDR)	
 	
 	li	t1, 1000  /* try for 1000 times, this times is not strictly test*/
 retry:
@@ -60,22 +60,22 @@ uart_put_hex:
 	add	a3, ra, zero  
 	add	a1, a0, zero
 	la	v0, hexchar
-	addu v0, v0, OFFSET
-	lui v1, 0xf000	
+	addu	v0, v0, OFFSET
+	lui	v1, 0xf000	
 	li	a2, 8
 
 next_hex:
 	and	a0, a1, v1
 	srl	a0, 28
-	addu t8, a0, v0
+	addu	t8, a0, v0
 	lb	a0, 0(t8)
-	bal uart_putc
+	bal	uart_putc
 	nop
-	addi a2, -1
-	bnez a2, next_hex
+	addi	a2, -1
+	bnez	a2, next_hex
 	sll	a1, 4
 
-	j a3
+	j	a3
 	nop
 hexchar:
 	.ascii "0123456789ABCDEF"
@@ -91,11 +91,11 @@ uart_puts:
 	lbu	a0, 0(t8)
 
 next_char:
-	beq a0, zero, 11f 
+	beq	a0, zero, 11f 
 	nop
 	bal	uart_putc
-	addiu t8, 1
-	b next_char
+	addiu	t8, 1
+	b	next_char
 	lbu	a0, 0(t8)
 11:
 	j	a3

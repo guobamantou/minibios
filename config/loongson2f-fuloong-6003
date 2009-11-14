@@ -1,0 +1,46 @@
+#
+# Automatically generated make config: don't edit
+# minibios version: 0.0.8
+# Sat Nov 14 14:59:36 2009
+#
+
+#
+# CPU selection
+#
+CONFIG_LOONGSON2F=y
+# CONFIG_LOONGSON2G is not set
+
+#
+# cpu function selection
+#
+CONFIG_ENABLE_CACHE=y
+CONFIG_CLEAR_TLB=y
+
+#
+# Board selection
+#
+CONFIG_LOONGSON2F_FULOONG=y
+# CONFIG_LOONGSON2F_YEELOONG is not set
+
+#
+# minibios type
+#
+CONFIG_32BITS=y
+# CONFIG_64BITS is not set
+CONFIG_DYMATIC_CPUFREQ=y
+CONFIG_DEBUG=y
+
+#
+# Device
+#
+
+#
+# Flash
+#
+CONFIG_SST=y
+CONFIG_MACRONIX=y
+
+#
+# South Bridge
+#
+CONFIG_CS5536=y

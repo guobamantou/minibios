@@ -9,9 +9,9 @@ init_cache:
 
 init_icache:
 	andi	t0, a0, ICACHE_SIZE
-	srl		t0, ICACHE_SIZE_START_BIT
+	srl	t0, ICACHE_SIZE_START_BIT
 	andi	t1, a0, ICACHE_LINE_SIZE
-	srl		t1, ICACHE_LINE_SIZE_START_BIT
+	srl	t1, ICACHE_LINE_SIZE_START_BIT
 	li	t2, (2 << 6)	## index num = 2^(6 + t0 -t1)
 	sub	t0, t0, t1
 	sllv	t2, t2, t0	## t2 is index num now
@@ -30,9 +30,9 @@ init_icache:
 
 init_dcache:
 	andi	t0, a0, DCACHE_SIZE
-	srl		t0, DCACHE_SIZE_START_BIT
+	srl	t0, DCACHE_SIZE_START_BIT
 	andi	t1, a0, DCACHE_LINE_SIZE
-	srl		t1, DCACHE_SIZE_START_BIT
+	srl	t1, DCACHE_SIZE_START_BIT
 	li	t2, (2 << 6)	## index num = 2^(6 + t0 -t1)
 	sub	t0, t0, t1
 	sllv	t2, t2, t0	## t2 is index num now

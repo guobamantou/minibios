@@ -1,7 +1,6 @@
 /************* init smbus ***********************/
 /*** use t5, a0, v0, v1 ,ra,***/
 init_smb:
-	add	t5, ra, zero
 	/* disable smb and set freq */
 	li	a0, (((SMB_FREQ & 0x7f) << 1) | SMB_DISABLE) 
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
@@ -15,11 +14,6 @@ init_smb:
 	li	a0, 0x00
 	IO_OUTB(SMB_BASE_ADDR | SMB_ADDR);
 
-	/* enable smb now */
-	IO_INB(SMB_BASE_ADDR | SMB_CTRL2);
-	ori	a0, v0, SMB_ENABLE
-	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
-
 	/* clear all error status */
 	li	a0, 0xff
 	IO_OUTB(SMB_BASE_ADDR | SMB_STS);
@@ -29,8 +23,13 @@ init_smb:
 	ori	a0, v0, SMB_BUS_BUSY
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL_STS);
 	
-	j	t5
-endof_init_smb:
+	/* enable smb now */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL2);
+	ori	a0, v0, SMB_ENABLE
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL2);
+
+	j	ra
+	nop
 	
 /*
  * a0: slave addr
@@ -54,17 +53,12 @@ smb_read:
 	nop
 
 	/* send slave addr */
-	add a0, t5, zero		
+	add	a0, t5, zero		
 	IO_OUTB(SMB_BASE_ADDR | SMB_SDA);
 	bal	smb_wait
 	nop
-	bnez v0, error
+	bnez	v0, error
 	nop
-
-	/* ack */
-	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
-	ori	a0, v0, SMB_ACK
-	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
 
 	/* send index */
 	add	a0, t6, zero
@@ -83,18 +77,23 @@ smb_read:
 	bnez	v0, error
 	nop
 
+	/* ack */
+	IO_INB(SMB_BASE_ADDR | SMB_CTRL1);
+	ori	a0, v0, SMB_ACK
+	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
+
 	/* send slave addr */
-	ori a0, t5, 0x01		
+	ori	a0, t5, 0x01		
 	IO_OUTB(SMB_BASE_ADDR | SMB_SDA);
 	bal	smb_wait
 	nop
-	bnez v0, error
+	bnez	v0, error
 	nop
 
 	/* stop */
 	li	a0, SMB_STOP
 	IO_OUTB(SMB_BASE_ADDR | SMB_CTRL1);
-	bal smb_wait
+	bal	smb_wait
 	nop
 	bnez	v0, error
 	nop
@@ -105,8 +104,6 @@ smb_read:
 error:	
 	j	t7
 	nop	
-
-endof_smb_read:
 
 /* smb wait and error check */
 /* use t1, t2, t3, t4, v0, ra */
@@ -121,13 +118,13 @@ smb_wait:
 	addiu	t2, t2, -1
 	bnez	t2, 2b		# dont use delay slot here
 	nop
-	lui		t3, 0xbfd0
-	ori		t3, (SMB_BASE_ADDR | SMB_STS)
-	lbu		v0, 0(t3)
+	lui	t3, 0xbfd0
+	ori	t3, (SMB_BASE_ADDR | SMB_STS)
+	lbu	v0, 0(t3)
 	andi	v0, SMB_SDAST	# have transmit done or can receive now
 	bnez	v0, 3f
 	nop
-	lbu		v0, 0(t3)
+	lbu	v0, 0(t3)
 	andi	v0, (SMB_BER | SMB_NEGACK)
 	bnez	v0, 4f
 	nop
@@ -141,7 +138,3 @@ smb_wait:
 4:
 	j	t4
 	li	v0, 1
-
-	
-
-

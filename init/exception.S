@@ -44,42 +44,42 @@ tlb_exc:
 dump_reg:	
 	REALPRINTF("cause reg : 0x");
 	mfc0	a0, CP0_CAUSE
-	bal		uart_put_hex
+	bal	uart_put_hex
 	nop
 	REALPRINTF("\r\n      EPC : 0x");
 	mfc0	a0, CP0_EPC
-	bal		uart_put_hex
+	bal	uart_put_hex
 	nop
 	REALPRINTF("\r\n Exc-Code : 0x");
 	mfc0	s0, CP0_CAUSE
 	andi	s0, EXC_CODE 
-	srl		s0, s0, 2	
-	add		a0, s0, zero
-	bal		uart_put_hex
+	srl	s0, s0, 2	
+	add	a0, s0, zero
+	bal	uart_put_hex
 	nop
 	REALPRINTF("\r\n");
 
 detail:
 	sltiu	a0, s0, (EXC_FPE + 1)		
-	beq		a0, zero, 1f	# >EXC_TR
+	beq	a0, zero, 1f	# >EXC_TR
 	nop
-	la		a0, exc_int 
-	li		s1,	EXC_STR_LEN
-	mul		s1,	s0, s1
+	la	a0, exc_int 
+	li	s1, EXC_STR_LEN
+	mul	s1, s0, s1
 	nop
-	add		a0, s1
-	bal		uart_puts
+	add	a0, s1
+	bal	uart_puts
 	nop
 	b	stop
 	nop
 1:
-	li		a0, EXC_WATCH
-	bne		a0, s0, 1f
+	li	a0, EXC_WATCH
+	bne	a0, s0, 1f
 	nop
-	la		a0, exc_watch
-	bal		uart_puts
+	la	a0, exc_watch
+	bal	uart_puts
 	nop
-	b stop
+	b	stop
 	nop
 1:
 	REALPRINTF("unknown exception ^.^\r\n");

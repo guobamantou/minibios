@@ -11,7 +11,7 @@ ddr2_cfg:
 	sd	v0, 0(a0)
 
 ddr2_reg_write:
-	li	a0,	DDR2_CTRL_REG_NUM	## counter
+	li	a0, DDR2_CTRL_REG_NUM	## counter
 	la	v0, DDR2_CTRL00_LO
 	add	v0, v0, OFFSET			## v0 is source data addr 
 	dli	v1, PHY_TO_UNCACHED(DDR2_CTRL_REG_BASE) # v1 is config reg base addr
@@ -47,7 +47,7 @@ next_reg:
 	sub	a0, a0, s7
 	lw	v0, 0x50(s6)
 	dli	a1, 0xf8fff8ff  ## clear relative bits
-	and v0, a1
+	and	v0, a1
 	or	a0, v0, a0
 	sw	a0, 0x50(s6)
 
@@ -67,7 +67,7 @@ next_reg:
 	sll	a1, a1, 16
 	lw	v0, 0x70(s6)
 	li	v1, 0xfff0ffff
-	and v0, v0, v1
+	and	v0, v0, v1
 	or	v0, v0, a1
 	sw	v0, 0x70(s6)		## i test sb ,but not work,sw is ok
 
