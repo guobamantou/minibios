@@ -8,19 +8,20 @@ extern void init_cpu_freq(void);
 extern u32 cpu_freq;
 extern void *malloc(size_t);
 extern void free(void *);
-
+extern void poll_output(int);
 void main(void)
 {
 
 	int i;
 	struct flash_device flash_dev;
-	char *p, *q, *r;
 
 	i = boot_flash_init(&flash_dev);
 	if(i == 0)
 		early_printf("error\n");
 	
 	init_cpu_freq();
+	while(1)
+		poll_output(1000000);
 
 	printf("cpu freq is %d\n", cpu_freq);
 	while(1);

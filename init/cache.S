@@ -40,7 +40,6 @@ init_dcache:
 	sllv	t1, t0, t1	## t1 is icache line size 
 
 	lui	t0, 0x8000		## t0 use as 'VA'
-	mtc0	zero, CP0_TAGHI	
 	mtc0	zero, CP0_TAGLO		## set state bits to 00(invalid)
 1:
 	cache	D_INDEX_STORE_TAG, 0(t0)	
@@ -57,7 +56,6 @@ init_l2cache:
 	li	t1, 32
 
 	lui	t0, 0x8000		## t0 use as 'VA'
-	mtc0	zero, CP0_TAGHI	
 	mtc0	zero, CP0_TAGLO		## no other purpose, set state bits
 1:
 	cache	S_INDEX_STORE_TAG, 0(t0)	
