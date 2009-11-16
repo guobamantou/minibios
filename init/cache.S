@@ -1,6 +1,6 @@
 /************************************************/
 /**** use a0, a1, t0, t1, t2, t5, v0, v1, ra ****/
-/**** because no meas to get the number of ways, use 4 ****/
+/**** because no means to get the number of ways, use 4 ****/
 /**** NOTICE: loongson's cache instruction is not standard ****/
 
 init_cache:
@@ -20,10 +20,10 @@ init_icache:
 	sllv	t1, t0, t1	## t1 is icache line size 
 	lui	t0, 0x8000		## t0 use as 'VA'
 1:
-	cache	I_INDEX_INVALIDATE, 0(t0)	
-	cache	I_INDEX_INVALIDATE, 1(t0)	
-	cache	I_INDEX_INVALIDATE, 2(t0)	
-	cache	I_INDEX_INVALIDATE, 3(t0)	
+	cache	I_INDEX_INVALIDATE, 0(t0)	# Loongson2f user manual says cache invalide instruction affect all 4 ways
+#	cache	I_INDEX_INVALIDATE, 1(t0)	
+#	cache	I_INDEX_INVALIDATE, 2(t0)	
+#	cache	I_INDEX_INVALIDATE, 3(t0)	
 	addiu	t2, -1
 	bnez	t2, 1b
 	add	t0, t0, t1		## next index

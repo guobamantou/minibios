@@ -11,7 +11,7 @@ void poll_output(int rate)
 	if(tick++ < rate)
 		return;
 	tick = 0;
-	if(!output | !(*output))
+	if(!output || !(*output))
 		output = output_array;
 	printf("\b%c", *output++);	
 }
