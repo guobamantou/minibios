@@ -8,7 +8,6 @@
 #include <debug.h>
 #include <delay.h>
 
-#ifdef CONFIG_DEBUG
 void print_flash_device(struct flash_device *dev)
 {
 	if(dev){
@@ -20,11 +19,6 @@ void print_flash_device(struct flash_device *dev)
 		printf("flash vaddr is %x\n", dev->vaddr);
 	}
 }
-#else
-void print_flash_device(struct flash_device *dev)
-{
-}
-#endif
 
 #ifdef CONFIG_SST
 extern struct flash_ops sst_flash_ops;
