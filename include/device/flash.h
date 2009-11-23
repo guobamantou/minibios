@@ -2,15 +2,15 @@
 
 struct flash_ops;
 typedef struct flash_device {
-	char *name;
-	ulong vaddr;
+	char	*name;
+	ulong	vaddr;
 	u8	manufact_id;
 	u8	device_id;
 	u8	size;        // unit 64KB
 	u8	sector_size; // unit 4KB
 	u8	type;
-	struct flash_ops *ops;
-}flash_device;
+	struct flash_ops	*ops;
+} flash_device;
 
 struct flash_ops {
 	void (*flash_erase_chip)(struct flash_device *);	

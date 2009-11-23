@@ -4,6 +4,7 @@
 #include <io.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <debug.h>
 #include <delay.h>
@@ -27,7 +28,7 @@ extern struct flash_ops sst_flash_ops;
 extern struct flash_ops mx_flash_ops;
 #endif
 
-int flash_ident(struct flash_device *dev)
+static int flash_ident(struct flash_device *dev)
 {
 	u8 manufactId = 0, deviceId = 0;
 
@@ -73,7 +74,7 @@ int flash_ident(struct flash_device *dev)
 	return 0;
 }
 
-int boot_flash_init(struct flash_device *dev)
+int bootflash_init(struct flash_device *dev)
 {
 #ifdef CONFIG_64BITS
 	dev->vaddr = 0xffffffffbfc00000;
@@ -120,7 +121,7 @@ static int param_check(struct flash_device *dev, ulong start_addr, ulong end_add
 	return 1;
 }
 
-int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
+static int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 {
 	if(erase_not_aligned(dev, start_addr))		
 		start_addr = head_erase_align(dev, start_addr);
@@ -163,7 +164,7 @@ int flash_erase(struct flash_device *dev, ulong start_addr, ulong end_addr)
 
 extern void poll_output(int);
 
-int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, u8 *data_addr)
+static int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, u8 *data_addr)
 {
 	int i;
 	u8 *p = data_addr;
@@ -197,13 +198,12 @@ int flash_program(struct flash_device *dev, ulong start_addr, ulong end_addr, u8
 	return 0;
 }
 
-#define SECTOR_SIZE 0x1000   // 4KB
-u8 tmp_buf[SECTOR_SIZE];
 
 /* program data_addr[0-data_size] to dev, starting addr's offset is flash_offset*/
 int flash_write(struct flash_device *dev, u32 flash_offset, char *data_addr, size_t data_size)
 {
 	int ret;
+	u8  *tmp_buf; // for store flash content which will be use later
 	size_t pre_size;	
 	ulong real_start_addr;
 	ulong start_addr = dev->vaddr + flash_offset;
@@ -211,7 +211,7 @@ int flash_write(struct flash_device *dev, u32 flash_offset, char *data_addr, siz
 	real_start_addr = head_erase_align(dev, start_addr);  	
 	pre_size = start_addr - real_start_addr;
 	
-	//tmp_buf = malloc(pre_size + data_size); will implement shortly
+	tmp_buf = malloc(pre_size + data_size); 
 	if(tmp_buf == NULL)	{
 		printf("out of memory!\n");
 		return -ENOMEM;

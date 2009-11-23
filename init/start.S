@@ -215,6 +215,8 @@ detect_cs5536:
 	nop
 #endif
 
+### I dont know whether _edata and _end is 8-byte aligned, but seems yes ###
+
 	REALPRINTF("COPY IMAGE TO MEMORY........\r\n");
 	la	v0, _ftext		##  start addr
 	la	v1, _edata		##  data end addr(bss is special)

@@ -2,7 +2,7 @@
 #include <device/flash.h>
 
 /* return non-zero means busy*/
-int sst_erase_busy(struct flash_device *dev, u32 offset)
+static int sst_erase_busy(struct flash_device *dev, u32 offset)
 {
 	u8 poll;
 	ulong flash_addr = dev->vaddr;
@@ -14,7 +14,7 @@ int sst_erase_busy(struct flash_device *dev, u32 offset)
 }
 
 /* return non-zero means busy*/
-int sst_program_busy(struct flash_device *dev, u32 offset)
+static int sst_program_busy(struct flash_device *dev, u32 offset)
 {
 	u8 poll1, poll2;
 	ulong flash_addr = dev->vaddr;
@@ -26,7 +26,7 @@ int sst_program_busy(struct flash_device *dev, u32 offset)
 	return 0;
 }
 
-void sst_flash_program(struct flash_device *dev, u32 offset, u8 val)
+static void sst_flash_program(struct flash_device *dev, u32 offset, u8 val)
 {
 	ulong flash_addr = dev->vaddr;
 	
@@ -36,7 +36,7 @@ void sst_flash_program(struct flash_device *dev, u32 offset, u8 val)
 	outb(flash_addr + offset, val);
 }
 
-void sst_erase_sector(struct flash_device *dev, u32 offset)
+static void sst_erase_sector(struct flash_device *dev, u32 offset)
 {
 	ulong flash_addr = dev->vaddr;
 	
@@ -48,7 +48,7 @@ void sst_erase_sector(struct flash_device *dev, u32 offset)
 	outb(flash_addr + offset, 0x30);
 }
 
-void sst_erase_chip(struct flash_device *dev)
+static void sst_erase_chip(struct flash_device *dev)
 {
 	ulong flash_addr = dev->vaddr;
 	
@@ -62,9 +62,9 @@ void sst_erase_chip(struct flash_device *dev)
 
 struct flash_ops sst_flash_ops = {
 	.flash_erase_chip 	= sst_erase_chip,
-	.flash_erase_sector = sst_erase_sector,
+	.flash_erase_sector	= sst_erase_sector,
 	.flash_erase_busy	= sst_erase_busy,
-	.flash_program_busy = sst_program_busy,
+	.flash_program_busy	= sst_program_busy,
 	.flash_program		= sst_flash_program,
 };
 
